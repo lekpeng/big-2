@@ -62,11 +62,17 @@ async function distributeCards() {
 distributeCards();
 
 // EVENT LISTENERS FOR SORTING
-const sortNumButton = document.querySelector(".sort-number");
-const sortSuitButton = document.querySelector(".sort-suit");
+const sortNumButtons = document.querySelectorAll(".sort-number");
+const sortSuitButtons = document.querySelectorAll(".sort-suit");
 const orderMapping = {};
-sortNumButton.addEventListener("click", () => sortCards("num"));
-sortSuitButton.addEventListener("click", () => sortCards("suit"));
+
+sortNumButtons.forEach((sortNumButton) => {
+  sortNumButton.addEventListener("click", (event) => sortCards("num", event));
+});
+
+sortSuitButtons.forEach((sortSuitButton) => {
+  sortSuitButton.addEventListener("click", (event) => sortCards("suit", event));
+});
 
 suitsRank = {
   D: 1,
@@ -91,8 +97,9 @@ valueRank = {
   2: 15,
 };
 
-function sortCards(type) {
-  const imagesArray = document.querySelectorAll(".playerHand-holding"); //nodes
+function sortCards(type, event) {
+  const idOfParent = event.target.parentNode.id;
+  const imagesArray = document.querySelectorAll(`.${idOfParent}-holding`); //nodes
 
   const codesOfCurrentOrder = [...imagesArray].map((imgElm) => imgElm.id);
   const copyOfCodesToSort = [...codesOfCurrentOrder];

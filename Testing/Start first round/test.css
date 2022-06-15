@@ -1,0 +1,15 @@
+img.cards {
+  width: 6em;
+  padding: 5px;
+  cursor: pointer;
+}
+
+/* #AD {
+  box-shadow: 0 0 10px 1px rgb(11, 243, 11);
+} */
+
+.hand-cards {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+}

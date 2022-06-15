@@ -4,12 +4,6 @@ const urlDraw = `https://deckofcardsapi.com/api/deck/${deckID}/draw/?count=52`;
 const urlListDeckPartial = `https://deckofcardsapi.com/api/deck/${deckID}/pile/`;
 
 //Function to fetch data via API
-async function fetchDataAsync(url) {
-  const response = await fetch(url);
-  const data = await response.json();
-  return data;
-}
-
 const playerHandsCodesOnly = {};
 const playerHands = {};
 const players = ["playerHand", "com1Hand", "com2Hand", "com3Hand"];

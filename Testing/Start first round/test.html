@@ -4,9 +4,75 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="test.css" />
     <title>Document</title>
   </head>
   <body>
-    <script src="test.js"></script>
+    <div class="container">
+      <!-- INSTRUCTIONS -->
+      <h1>Instructions</h1>
+      <div id="instructions"></div>
+
+      <!-- PLAYER -->
+      <div id="playerHand" class="border text-center">
+        <h3>Player Hand</h3>
+        <button class="pass" type="button">Pass</button>
+        <button class="play" type="button">Play</button>
+        <div id="playerHandCards" class="hand-cards"></div>
+        <button class="sort-number" type="button">Sort By Number</button>
+        <button class="sort-suit" type="button">Sort By Suit</button>
+      </div>
+
+      <!-- COM 1 -->
+      <div id="com1Hand" class="border text-center">
+        <h3>Com 1 Hand</h3>
+        <button class="pass" type="button">Pass</button>
+        <button class="play" type="button">Play</button>
+        <div id="com1HandCards" class="hand-cards"></div>
+        <button class="sort-number" type="button">Sort By Number</button>
+        <button class="sort-suit" type="button">Sort By Suit</button>
+      </div>
+
+      <!-- PLAYING PILE -->
+      <div id="playingPile" class="border text-center">
+        <h3 class="text-danger">Play Cards Here</h3>
+        <div id="playingPileCards"></div>
+      </div>
+
+      <!-- COM 2 -->
+      <div id="com2Hand" class="border text-center">
+        <h3>Com 2 Hand</h3>
+        <button class="pass" type="button">Pass</button>
+        <button class="play" type="button">Play</button>
+        <div id="com2HandCards" class="hand-cards"></div>
+        <button class="sort-number" type="button">Sort By Number</button>
+        <button class="sort-suit" type="button">Sort By Suit</button>
+      </div>
+
+      <!-- COM 3 -->
+      <div id="com3Hand" class="border text-center">
+        <h3>Com 3 Hand</h3>
+        <button class="pass" type="button">Pass</button>
+        <button class="play" type="button">Play</button>
+        <div id="com3HandCards" class="hand-cards"></div>
+        <button class="sort-number" type="button">Sort By Number</button>
+        <button class="sort-suit" type="button">Sort By Suit</button>
+      </div>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+      crossorigin="anonymous"
+    ></script>
+    <script src="genericAndAPIFuncs.js"></script>
+    <script src="genericCardAPICalls.js"></script>
+    <script src="eventListenerSorting.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>
