@@ -61,10 +61,12 @@ async function distributeCards() {
 
 distributeCards();
 
-// EVENT LISTENER FOR SORTING
+// EVENT LISTENERS FOR SORTING
 const sortNumButton = document.querySelector(".sort-number");
+const sortSuitButton = document.querySelector(".sort-suit");
 const orderMapping = {};
-sortNumButton.addEventListener("click", sortNums);
+sortNumButton.addEventListener("click", () => sortCards("num"));
+sortSuitButton.addEventListener("click", () => sortCards("suit"));
 
 suitsRank = {
   D: 1,
@@ -81,7 +83,7 @@ valueRank = {
   7: 7,
   8: 8,
   9: 9,
-  10: 10,
+  0: 10,
   J: 11,
   Q: 12,
   K: 13,
@@ -89,16 +91,19 @@ valueRank = {
   2: 15,
 };
 
-function sortNums() {
+function sortCards(type) {
   const imagesArray = document.querySelectorAll(".playerHand-holding"); //nodes
 
   const codesOfCurrentOrder = [...imagesArray].map((imgElm) => imgElm.id);
   const copyOfCodesToSort = [...codesOfCurrentOrder];
 
-  copyOfCodesToSort.sort((a, b) => suitsRank[a[1]] - suitsRank[b[1]]);
-  copyOfCodesToSort.sort((a, b) => valueRank[a[0]] - valueRank[b[0]]);
-
-  console.log("copyOfCodesToSort", copyOfCodesToSort);
+  if (type === "suit") {
+    copyOfCodesToSort.sort((a, b) => valueRank[a[0]] - valueRank[b[0]]);
+    copyOfCodesToSort.sort((a, b) => suitsRank[a[1]] - suitsRank[b[1]]);
+  } else {
+    copyOfCodesToSort.sort((a, b) => suitsRank[a[1]] - suitsRank[b[1]]);
+    copyOfCodesToSort.sort((a, b) => valueRank[a[0]] - valueRank[b[0]]);
+  }
 
   codesOfCurrentOrder.forEach((code) => {
     orderMapping[code] = parseInt(copyOfCodesToSort.indexOf(code));
