@@ -1,147 +1,264 @@
-// CONSIDER PUTTING PLAYER'S CARDS IN PILES AS WELL SO CAN JUST ADD TO DISCARD PILE WITHOUT HAVING TO PUSH AND POP ARRAY
+// Names of players and cards
+const players = ["playerHand", "com1Hand", "com2Hand", "com3Hand"];
+const playerHandsCodesOnly = {}; //array of card objects
+const playerHands = {}; //array of card codes strings
 
-//DeckID
-const deckID = "tyu78tcx00jy";
+// DOM ELEMENTS
+const instructionsDiv = document.querySelector("#instructions");
+const handCardsContainers = document.querySelectorAll(".hand-cards");
+const playingPileCards = document.querySelector("#playingPileCards");
 
-//Function to fetch data via API
-async function fetchDataAsync(url) {
-  const response = await fetch(url);
-  const data = await response.json();
-  return data;
-}
-
-class cardHand {
-  static suitsRank = {
-    DIAMONDS: 1,
-    CLUBS: 2,
-    HEARTS: 3,
-    SPADES: 4,
-  };
-
-  static valueRank = {
-    3: 3,
-    4: 4,
-    5: 5,
-    6: 6,
-    7: 7,
-    8: 8,
-    9: 9,
-    10: 10,
-    JACK: 11,
-    QUEEN: 12,
-    KING: 13,
-    ACE: 14,
-    2: 15,
-  };
-
-  constructor(cards, owner) {
+class Valid {
+  constructor(cards, currentRound, type = "normal") {
+    //cards here is an array of the codes...
     this.cards = cards;
-    this.owner = owner;
+    this.num = cards.length;
+    this.type = type;
+    this.currentRound = currentRound;
   }
 
-  sortHandByNumber() {
-    this.cards.sort((a, b) => cardHand.suitsRank[a.suit] - cardHand.suitsRank[b.suit]);
-    this.cards.sort((a, b) => cardHand.valueRank[a.value] - cardHand.valueRank[b.value]);
-    console.log(this.cards);
+  validFirstTurn() {
+    console.log("type", this.type);
+    console.log("checking valid first turn");
+    console.log("current round", this.currentRound);
+    if (this.type === "first") {
+      return this.validCount() && this.cards.includes("3D") && this.validCards();
+    }
+    console.log("validCount", this.validCount());
+    console.log("validCards", this.validCards());
+    return this.validCount() && this.validCards();
   }
 
-  sortHandBySuit() {
-    this.cards.sort((a, b) => cardHand.valueRank[a.value] - cardHand.valueRank[b.value]);
-    this.cards.sort((a, b) => cardHand.suitsRank[a.suit] - cardHand.suitsRank[b.suit]);
-    console.log(this.cards);
+  validGenericTurn() {
+    console.log("checking valid generic turn");
+    console.log("current round", this.currentRound);
+    return (
+      this.num === this.currentRound.numCardsAllowed &&
+      this.validCards() &&
+      this.validBeatsOpponent()
+    );
   }
 
-  // FUNCTIONS FOR COMPUTERS TO PLAY
-  checkDoubles() {
-    // to return cards if exist, else return false
+  // VALID IN TERMS OF COUNT
+  validCount() {
+    return this.num === 1 || this.num === 2 || this.num === 5;
   }
 
-  checkStraightFlush() {
-    // to return cards if exist, else return false
+  // IF COUNT VALID, ARE CARDS VALID?
+
+  validCards() {
+    if (this.num === 2) {
+      return this.validDouble();
+    }
+    return true;
+  }
+  // else if (this.num === 5) {
+  //   return this.validFiveCard()}
+
+  // can generalise this to checking for triple/quadruple, this function alr assumes the num matches
+  validDouble() {
+    const valueToMatch = this.cards[0][0];
+    return this.cards.every((code) => code[0] === valueToMatch);
   }
 
-  checkFourOfAKind() {
-    // to return cards if exist, else return false
-  }
+  // DOES IT BEAT OPPONENT?
+  cardCodeToRank(code) {
+    let value, suit;
+    const codeArr = code.split("");
+    [value, suit] = codeArr;
 
-  checkFullHouse() {
-    // to return cards if exist, else return false
-  }
-
-  checkFlush() {
-    // to return cards if exist, else return false
-  }
-
-  checkStraight() {
-    // to return cards if exist, else return false
-  }
-}
-
-class round {
-  constructor(whoseTurn = null, pilename, playerHand, com1Hand, com2Hand, com3Hand) {
-    this.whoseTurn = whoseTurn;
-    this.playerHand = playerHand;
-    this.computer1Hand = com1Hand;
-    this.computer2Hand = com2Hand;
-    this.computer3Hand = com3Hand;
-    this.pilename = pilename;
-  }
-
-  //owner should be a string and cards should be an array of 1, 2 or 5 cards
-  addToPile(owner, cards){
-    `https://deckofcardsapi.com/api/deck/${deckID}/pile/${this.pilename}/add/?cards=3D`
-
-  }
-
-  startFirstRound() {
-    const allPlayersCards = [
-      this.playerHand,
-      this.computer1Hand,
-      this.computer2Hand,
-      this.computer3Hand,
-    ];
-    for (hand of allPlayersCards) {
-      if (hand.map((cardObj) => cardObj.code).includes("3D")) {
-        return hand.owner;
+    const rank = codeArr.map((item) => {
+      if (item === value) {
+        return valueRank[value];
       }
+      return suitsRank[suit];
+    });
+
+    return rank;
+  }
+
+  validBeatsOpponent() {
+    let valueToBeatRank, suitToBeatRank;
+    [valueToBeatRank, suitToBeatRank] = this.cardCodeToRank(this.currentRound.cardsToBeat[0]);
+
+    let valueRank, suitRank;
+    [valueRank, suitRank] = this.cardCodeToRank(this.cards[0]);
+
+    if (this.num === 1) {
+      return (
+        valueRank > valueToBeatRank || (valueRank === valueToBeatRank && suitRank > suitToBeatRank)
+      );
     }
 
-
-    
+    if (this.num === 2) {
+      let valueRankSecond, suitRankSecond;
+      [valueRankSecond, suitRankSecond] = this.cardCodeToRank(this.cards[1]);
+      return valueRank > valueToBeatRank || suitRank === 4 || suitRankSecond === 4;
+    }
   }
-
-  continueRound()
 }
 
-class bigTwoGame {
+class Round {
+  constructor(type, turn = null) {
+    this.type = type; //is it a first round where 3D must be used or not?
+    this.turn = turn; //whose turn
+    this.isAnyCardPlayed = false;
+    this.numPasses = 0;
+    this.cardsToBeat;
+    this.numCardsAllowed;
+  }
+  addToPlayingPile(cardsArr) {
+    addCardsToPlayingPile(cardsArr);
+    if (!this.isAnyCardPlayed) {
+      this.isAnyCardPlayed = true;
+      this.numCardsAllowed = cardsArr.length;
+      console.log("num cards allowed", this.numCardsAllowed);
+    }
+
+    this.cardsToBeat = cardsArr;
+    this.setTurnForNextPlayer();
+  }
+
+  setTurnForNextPlayer() {
+    const currIndex = players.indexOf(this.turn);
+    this.turn = players[(currIndex + 1) % 4];
+    this.setInstructionsInDOM(`It is now ${this.turn}'s turn!`);
+  }
+
+  async findDiamondThreeOwner() {
+    await listAllCards();
+    for (const player of players) {
+      if (playerHandsCodesOnly[player].includes("3D")) {
+        this.turn = player;
+      }
+    }
+  }
+
+  async startRound() {
+    if (this.type === "first") {
+      await this.findDiamondThreeOwner();
+      this.setInstructionsInDOM(
+        `${this.turn} is holding the 3 of Diamonds and should start the game`
+      );
+    } else {
+      //CLEAR CARDS
+      this.setInstructionsInDOM(
+        `Since everyone passed during ${this.turn}'s turn. ${this.turn} is free to start any card combi`
+      );
+      const cardsNodes = playingPileCards.querySelectorAll("[class$='holding cards']");
+      const cardsArr = [...cardsNodes].map((elm) => elm.id);
+      discardPlayingPile(cardsArr);
+    }
+  }
+
+  setInstructionsInDOM(msg) {
+    instructionsDiv.innerText = msg;
+  }
+}
+
+class BigTwoGame {
   constructor() {
-    // this.players = ["Player", "Com1", "Com2", "Com3"];
-    // this.playerHand = [];
-    // this.computer1Hand = [];
-    // this.computer2Hand = [];
-    // this.computer3Hand = [];
+    this.currentRound;
   }
 
-  shuffleCards() {
-    fetchDataAsync(`https://deckofcardsapi.com/api/deck/${deckID}/shuffle/`);
-  }
+  // boundToggleCardSelection = (event) => this.toggleCardSelection(event);
+  toggleCardSelection(event) {
+    const cardElm = event.target;
+    // return if not player's turn or player clicked on something that's not a card?
+    if (cardElm.className !== `${this.currentRound.turn}-holding cards`) {
+      return;
+    }
 
-  distributeCards() {
-    fetchDataAsync(`https://deckofcardsapi.com/api/deck/${deckID}/draw/?count=52`).then((rs) => {
-      const allCards = rs.cards;
-      this.playerHand = new cardHand(allCards.slice(0, 13), "Player");
-      this.computer1Hand = new cardHand(allCards.slice(13, 26), "Com1");
-      this.computer2Hand = new cardHand(allCards.slice(26, 39), "Com2");
-      this.computer3Hand = new cardHand(allCards.slice(39, 52), "Com3");
-      this.playerHand.sortHandBySuit();
+    // if card is not selected, select it
+    if (!cardElm.title || cardElm.title === "unselected") {
+      cardElm.title = "selected";
+    } else {
+      cardElm.title = "unselected";
+    }
+  }
+  proceedWithAdditionToPile(selectedCardsCodes) {
+    this.currentRound.addToPlayingPile(selectedCardsCodes);
+    selectedCardsCodes.forEach((code) => {
+      document.querySelector(`[id="${code}"]`).title = "unselected";
     });
   }
 
-  start() {
-    //distribute cards
-    //initialise first round to start with player holding 3 diamonds
+  checkValidAction(action, event) {
+    const selectedCardsCodes = [...document.querySelectorAll(".cards[title='selected']")].map(
+      (cardImgElm) => cardImgElm.id
+    );
+
+    // console.log("selectedCards", selectedCardsCodes);
+    if (event.target.parentNode.id !== this.currentRound.turn) {
+      console.log("not your turn bodoh");
+      // not player's turn
+      return;
+    }
+    if (this.currentRound.type === "first" && !this.currentRound.isAnyCardPlayed) {
+      if (action === "pass") {
+        // player with 3D cannot pass
+        console.log("player with 3D cannot pass");
+      } else {
+        const checkValidity = new Valid(selectedCardsCodes, this.currentRound, "first");
+        if (checkValidity.validFirstTurn()) {
+          this.proceedWithAdditionToPile(selectedCardsCodes);
+        } else {
+          console.log("this is invalid");
+        }
+      }
+    } else if (!this.currentRound.isAnyCardPlayed) {
+      if (action === "pass") {
+        console.log("first player of the round cannot pass");
+      } else {
+        const checkValidity = new Valid(selectedCardsCodes, this.currentRound);
+        if (checkValidity.validFirstTurn()) {
+          this.proceedWithAdditionToPile(selectedCardsCodes);
+        } else {
+          console.log("this is invalid for else if");
+        }
+      }
+    } else {
+      if (action === "pass") {
+        this.currentRound.setTurnForNextPlayer();
+        this.currentRound.numPasses += 1;
+        if (this.currentRound.numPasses === 3) {
+          this.currentRound = new Round("normal", this.currentRound.turn);
+          this.currentRound.startRound();
+        }
+      } else {
+        this.currentRound.numPasses = 0;
+        const checkValidity = new Valid(selectedCardsCodes, this.currentRound);
+        if (checkValidity.validGenericTurn()) {
+          this.proceedWithAdditionToPile(selectedCardsCodes);
+        } else {
+          console.log("this is invalid non first round");
+        }
+      }
+    }
+  }
+
+  async startGame() {
+    await distributeCards();
+    this.currentRound = new Round("first");
+    this.currentRound.startRound();
+    // EVENT LISTENERS FOR CARDS CLICKING (the green light only appears when it's your turn)
+    handCardsContainers.forEach((handCardsContainer) => {
+      handCardsContainer.addEventListener("click", (event) => this.toggleCardSelection(event));
+    });
+
+    // EVENT LISTENERS FOR PASS AND PLAY BUTTONS
+    const passButtons = document.querySelectorAll(".pass");
+    const playButtons = document.querySelectorAll(".play");
+
+    passButtons.forEach((passButton) => {
+      passButton.addEventListener("click", (event) => this.checkValidAction("pass", event));
+    });
+
+    playButtons.forEach((playButton) => {
+      playButton.addEventListener("click", (event) => this.checkValidAction("play", event));
+    });
   }
 }
 
-newGame = new bigTwoGame();
-newGame.distributeCards();
+newGame = new BigTwoGame();
+newGame.startGame();
