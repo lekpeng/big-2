@@ -1,17 +1,13 @@
-// CHANGE IT SO THAT THERE IS NO ABSOLUTE POSITIONING
-
 function makeCardMovableInPlayingPile(cardElm) {
-  let active = false;
-  let currentX;
-  let currentY;
-  let initialX;
-  let initialY;
-  let xOffset = 0;
-  let yOffset = 0;
+  let active = false,
+    xOffset = 0,
+    yOffset = 0;
 
-  playingPileCards.addEventListener("pointerdown", dragStart, false);
-  playingPileCards.addEventListener("pointerup", dragEnd, false);
-  playingPileCards.addEventListener("pointermove", drag, false);
+  let currentX, currentY, initialX, initialY;
+
+  playingPileContainer.addEventListener("pointerdown", dragStart, false);
+  playingPileContainer.addEventListener("pointerup", dragEnd, false);
+  playingPileContainer.addEventListener("pointermove", drag, false);
 
   function dragStart(e) {
     initialX = e.clientX - xOffset;

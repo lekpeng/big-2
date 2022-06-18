@@ -1,5 +1,4 @@
-// EVENT LISTENERS FOR SORTING
-const orderMapping = {};
+const orderMapping = {}; // for ordering cards in sorting
 
 suitsRank = {
   D: 1,
@@ -8,7 +7,7 @@ suitsRank = {
   S: 4,
 };
 
-valueRank = {
+valuesRank = {
   3: 3,
   4: 4,
   5: 5,
@@ -33,26 +32,26 @@ document.querySelectorAll(".sort-suit").forEach((sortSuitButton) => {
 });
 
 function sortCards(type, event) {
-  const imagesArray = document.querySelectorAll(
-    `.${event.target.parentNode.id}-holding`
-  ); //nodes actually, not array
-
-  const codesOfCurrentOrder = [...imagesArray].map((imgElm) => imgElm.id);
+  const imgNodeList = event.target.parentNode.querySelectorAll("[class$='holding cards']");
+  const codesOfCurrentOrder = [...imgNodeList].map((imgElm) => imgElm.id);
   const copyOfCodesToSort = [...codesOfCurrentOrder];
 
   if (type === "suit") {
-    copyOfCodesToSort.sort((a, b) => valueRank[a[0]] - valueRank[b[0]]);
+    // sort by values then suits
+    copyOfCodesToSort.sort((a, b) => valuesRank[a[0]] - valuesRank[b[0]]);
     copyOfCodesToSort.sort((a, b) => suitsRank[a[1]] - suitsRank[b[1]]);
   } else {
+    // sort by suits then values
     copyOfCodesToSort.sort((a, b) => suitsRank[a[1]] - suitsRank[b[1]]);
-    copyOfCodesToSort.sort((a, b) => valueRank[a[0]] - valueRank[b[0]]);
+    copyOfCodesToSort.sort((a, b) => valuesRank[a[0]] - valuesRank[b[0]]);
   }
 
   codesOfCurrentOrder.forEach((code) => {
     orderMapping[code] = copyOfCodesToSort.indexOf(code);
   });
 
-  imagesArray.forEach((imgElm) => {
+  // reordering the cards using order attribute of flexbox
+  imgNodeList.forEach((imgElm) => {
     imgElm.style.order = orderMapping[imgElm.id];
   });
 }

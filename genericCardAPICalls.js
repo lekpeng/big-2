@@ -1,80 +1,82 @@
-// Consts used in API Calls
+// Constants used in API Calls
 const deckID = "tyu78tcx00jy";
 const urlShuffle = `https://deckofcardsapi.com/api/deck/${deckID}/shuffle/`;
 const urlDraw = `https://deckofcardsapi.com/api/deck/${deckID}/draw/?count=52`;
-const urlAddDeckPartial = `https://deckofcardsapi.com/api/deck/${deckID}/pile/`;
-const urlListDeckPartial = `https://deckofcardsapi.com/api/deck/${deckID}/pile/`;
-const playingPile = "playingPile";
-const discardPile = "discardPile";
+const urlAddOrListDeckPartial = `https://deckofcardsapi.com/api/deck/${deckID}/pile/`;
+const playingPile = "playingpile";
+const discardPile = "discardpile";
 
 // Distribution of Cards
-// from array of card obj to comma format
-function getCardCodesFromCards(cardsObjs) {
-  return cardsObjs.map((cardObj) => cardObj.code).join(",");
+// convert from array of card obj to comma format
+function getCommaFormatFromCardObjs(cardsObjs) {
+  return getCommaFormatFromCodes(cardsObjs.map((cardObj) => cardObj.code));
 }
-// from array of card codes to comma format
-function getCardCodesInCommaFormat(cardsArr) {
+// convert from array of card codes to comma format
+function getCommaFormatFromCodes(cardsArr) {
   return cardsArr.join(",");
 }
 
 async function distributeCards() {
+  // shuffle and draw all cards
   await fetchDataAsync(urlShuffle);
   const data = await fetchDataAsync(urlDraw);
   const allCards = data.cards;
+
+  // distribute cards to players
   for (const [index, player] of players.entries()) {
     const quarterOfCards = allCards.slice(index * 13, (index + 1) * 13);
-
     await fetchDataAsync(
-      urlAddDeckPartial + `${player}/add/?cards=${getCardCodesFromCards(quarterOfCards)}`
+      urlAddOrListDeckPartial +
+        `${playersToPilesMapping[player]}/add/?cards=${getCommaFormatFromCardObjs(quarterOfCards)}`
     );
 
-    const arrayOfCardImagesURLs = quarterOfCards.map((cardObj) => cardObj.image);
-
-    const arrayOfCardCodes = quarterOfCards.map((cardObj) => cardObj.code);
-    const container = document.querySelector(`#${player}Cards`);
-
-    arrayOfCardImagesURLs.forEach((url, index) => {
+    const container = document.querySelector(`#${player}-hand-container`);
+    // create card objects in DOM
+    quarterOfCards.forEach((cardObj) => {
       container.appendChild(
         elementCreator("img", {
-          src: url,
+          src: cardObj.image,
           className: `${player}-holding cards`,
-          id: arrayOfCardCodes[index],
+          id: cardObj.code,
         })
       );
     });
   }
 }
 
-// Listing Cards in Player Piles
+// List Cards in Player Piles
 async function listAllCards() {
   for (player of players) {
-    const result = await fetchDataAsync(urlListDeckPartial + `${player}/list/`);
-    const ArrayOfCardObj = result.piles[`${player}`].cards;
-    playerHands[player] = ArrayOfCardObj;
-    playerHandsCodesOnly[player] = ArrayOfCardObj.map((CardObj) => CardObj.code);
+    const data = await fetchDataAsync(
+      urlAddOrListDeckPartial + `${playersToPilesMapping[player]}/list/`
+    );
+    const cardObjs = data.piles[`${playersToPilesMapping[player]}`].cards;
+    playerHandsCodesOnly[player] = cardObjs.map((cardObj) => cardObj.code);
   }
 }
 
-// Add Card to Playing Pile
-async function addCardsToPlayingPile(cardsArr) {
+// Add Cards to Playing Pile
+async function addCardsToPlayingPile(cardCodes) {
   await fetchDataAsync(
-    urlAddDeckPartial + `${playingPile}/add/?cards=${getCardCodesInCommaFormat(cardsArr)}`
+    urlAddOrListDeckPartial + `${playingPile}/add/?cards=${getCommaFormatFromCodes(cardCodes)}`
   );
 
-  cardsArr.forEach((cardCode) => {
+  // add to playing pile in DOM
+  cardCodes.forEach((cardCode) => {
     const imgElm = document.querySelector(`[id="${cardCode}"]`);
-    playingPileCards.appendChild(imgElm);
+    playingPileContainer.appendChild(imgElm);
     makeCardMovableInPlayingPile(imgElm);
   });
 }
 
 // Discard playing pile cards after round
-async function discardPlayingPile(cardsArr) {
+async function discardPlayingPile(cardCodes) {
   await fetchDataAsync(
-    urlAddDeckPartial + `${discardPile}/add/?cards=${getCardCodesInCommaFormat(cardsArr)}`
+    urlAddOrListDeckPartial + `${discardPile}/add/?cards=${getCommaFormatFromCodes(cardCodes)}`
   );
 
-  cardsArr.forEach((cardCode) => {
+  // remove from playing pile in DOM
+  cardCodes.forEach((cardCode) => {
     const imgElm = document.querySelector(`[id="${cardCode}"]`);
     imgElm.remove();
   });
