@@ -1,8 +1,17 @@
-// Names of players and cards
+// REFLECT SPECIFIC FEEDBACK FOR INVALID SELECTION => ADD 5 CARD COMBIS AND WINNING CONDITIONS
+// => MAKE COM 1-3 ACTUAL ROBOTS
+
+// CONST VARIABLES
 const playerHandsCodesOnly = {}; //array of card objects
-// const playerHands = {}; //array of card codes strings
+
 const players = ["player", "com-1", "com-2", "com-3"];
 
+let playerNumCardsThrown = {};
+players.forEach((player) => {
+  playerNumCardsThrown[player] = 11;
+});
+
+// can change names of players here if we wish.
 let playersToPlayerNamesMapping = {};
 players.forEach((player) => {
   playersToPlayerNamesMapping[player] = player.toUpperCase().replace("-", " ");
@@ -26,7 +35,7 @@ class Valid {
     this.num = cards.length;
   }
 
-  // check validity based on turn
+  // check validity based on turn, see if can return array of boolean, and the specific thing that is invalid if any.
   validFirstTurn() {
     if (this.currentRound.type === "first") {
       return this.validCount() && this.cards.includes("3D") && this.validCards();
@@ -57,11 +66,58 @@ class Valid {
     return true;
   }
 
+  validFiveCard() {
+    return (
+      validStraight() ||
+      validFlush() ||
+      validFullHouse() ||
+      validFourOfAKind() ||
+      validStraightFlush()
+    );
+  }
+
   // can also use this for checking three of a kind and four of a kind
-  validSameValue() {
+  validSameValue(cardsArr = this.cards) {
     // get value of first card
-    const valueToMatch = this.cards[0][0];
-    return this.cards.every((code) => code[0] === valueToMatch);
+    const numberToMatch = cardsArr[0][0];
+    return cardsArr.every((code) => code[0] === numberToMatch);
+  }
+
+  validStraight() {
+    const cardValues = this.cards.map((code) => valuesRank[code[0]]);
+    const sortedValues = cardValues.sort();
+    if (cardValues.includes(15)) {
+      // equivalent to having cards 2,3,4,5,6 or A,2,3,4,5
+      return sortedValues === [3, 4, 5, 6, 15] || sortedValues === [3, 4, 5, 14, 15];
+    }
+    const minVal = Math.min(...cardValues);
+    return sortedValues === [...Array(5).keys()].map((i) => i + minVal);
+  }
+
+  validFlush() {
+    const suitToMatch = this.cards[0][1];
+    return this.cards.every((code) => code[1] === suitToMatch);
+  }
+
+  validFullHouse() {
+    const cardNums = this.cards.map((code) => [code[0]]);
+    const sortedNums = cardNums.sort();
+    return (
+      (this.validSameValue(sortedNums.slice(0, 2)) && this.validSameValue(sortedNums.slice(2))) ||
+      (this.validSameValue(sortedNums.slice(0, 3)) && this.validSameValue(sortedNums.slice(3)))
+    );
+  }
+
+  validFourOfAKind() {
+    const cardNums = this.cards.map((code) => [code[0]]);
+    const sortedNums = cardNums.sort();
+    return this.validSameValue(
+      sortedNums.slice(0, 4) || this.validSameValue(sortedNums.slice(1, 5))
+    );
+  }
+
+  validStraightFlush() {
+    return this.validFlush() && validStraight();
   }
 
   // assuming cards are valid, check if the cards beat the cards from the previous turn
@@ -98,8 +154,8 @@ class Valid {
 class Round {
   constructor(type, turn = null) {
     this.type = type; //takes the value "first" or "normal"
-    this.turn = turn; //whose turn
-    this.isFirstTurn = true; // this tells us whether it's the first turn of a game or not
+    this.turn = turn; //takes the player IDs
+    this.isFirstTurn = true;
     this.numPasses = 0;
     this.cardsToBeat;
     this.numCardsAllowed;
@@ -112,10 +168,20 @@ class Round {
       this.numCardsAllowed = cardsArr.length;
     }
     this.cardsToBeat = cardsArr;
-    this.setTurnForNextPlayer();
-    // cardsArr.forEach((code) => {
-    //   document.querySelector(`[id="${code}"]`).title = "unselected";
-    // });
+    playerNumCardsThrown[this.turn] += cardsArr.length;
+    if (this.foundWinningPlayer()) {
+      this.setInstructionsInDOM(
+        `The winner is ${playersToPlayerNamesMapping[this.foundWinningPlayer()]}`
+      );
+      // DELETE ALL ELEMENTS and announce winner maybe.
+    } else {
+      this.setTurnForNextPlayer();
+    }
+  }
+
+  foundWinningPlayer() {
+    // returns undefined if no winner yet, else return player ID
+    return players.find((player) => playerNumCardsThrown[player] === 13);
   }
 
   setTurnForNextPlayer() {

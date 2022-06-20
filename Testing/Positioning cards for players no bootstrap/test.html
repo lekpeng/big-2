@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      img {
+        width: 60px;
+      }
+      #com1,
+      #com2,
+      #com3,
+      #player,
+      #pile {
+        position: relative;
+        border: black solid;
+        padding: 0px;
+      }
+
+      .wrapper {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      .wrapper .hand {
+        background-color: orange;
+        /* display: flex;
+        flex-direction: column; */
+      }
+
+      #com1 {
+        transform: rotate(90deg);
+        left: -200px;
+        top: 300px;
+        width: 1600px;
+      }
+
+      #com3 {
+        transform: rotate(270deg);
+        left: 200px;
+        top: 300px;
+        width: 1600px;
+        /* width: 2900px; */
+      }
+
+      #player {
+        top: 1000px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="com2">
+      Com 2
+      <div class="hand">
+        <img src="cards/1.png" alt="" />
+        <img src="cards/2.png" alt="" />
+        <img src="cards/3.png" alt="" />
+        <img src="cards/1.png" alt="" />
+        <img src="cards/2.png" alt="" />
+        <img src="cards/3.png" alt="" />
+        <img src="cards/1.png" alt="" />
+        <img src="cards/2.png" alt="" />
+        <img src="cards/3.png" alt="" />
+        <img src="cards/1.png" alt="" />
+        <img src="cards/2.png" alt="" />
+        <img src="cards/3.png" alt="" />
+        <img src="cards/3.png" alt="" />
+      </div>
+    </div>
+
+    <div class="wrapper">
+      <div id="com1">
+        Com 1
+        <div class="hand">
+          <img src="cards/4.png" alt="" />
+          <img src="cards/5.png" alt="" />
+          <img src="cards/6.png" alt="" />
+          <img src="cards/4.png" alt="" />
+          <img src="cards/5.png" alt="" />
+          <img src="cards/6.png" alt="" />
+          <img src="cards/4.png" alt="" />
+          <img src="cards/5.png" alt="" />
+          <img src="cards/6.png" alt="" />
+          <img src="cards/4.png" alt="" />
+          <img src="cards/5.png" alt="" />
+          <img src="cards/6.png" alt="" />
+          <img src="cards/6.png" alt="" />
+        </div>
+      </div>
+
+      <div id="pile">
+        Playing Pile
+        <div class="hand"></div>
+      </div>
+
+      <div id="com3">
+        Com 3
+        <div class="hand">
+          <img src="cards/7.png" alt="" />
+          <img src="cards/8.png" alt="" />
+          <img src="cards/9.png" alt="" />
+          <img src="cards/7.png" alt="" />
+          <img src="cards/8.png" alt="" />
+          <img src="cards/9.png" alt="" />
+          <img src="cards/7.png" alt="" />
+          <img src="cards/8.png" alt="" />
+          <img src="cards/9.png" alt="" />
+          <img src="cards/7.png" alt="" />
+          <img src="cards/8.png" alt="" />
+          <img src="cards/9.png" alt="" />
+          <img src="cards/9.png" alt="" />
+        </div>
+      </div>
+    </div>
+
+    <div id="player" class="mt-5">
+      Player
+      <div class="hand">
+        <img src="cards/10.png" alt="" />
+        <img src="cards/11.png" alt="" />
+        <img src="cards/12.png" alt="" />
+        <img src="cards/10.png" alt="" />
+        <img src="cards/11.png" alt="" />
+        <img src="cards/12.png" alt="" />
+        <img src="cards/10.png" alt="" />
+        <img src="cards/11.png" alt="" />
+        <img src="cards/12.png" alt="" />
+        <img src="cards/10.png" alt="" />
+        <img src="cards/11.png" alt="" />
+        <img src="cards/12.png" alt="" />
+        <img src="cards/12.png" alt="" />
+      </div>
+    </div>
+  </body>
+</html>
