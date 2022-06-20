@@ -8,7 +8,7 @@ const players = ["player", "com-1", "com-2", "com-3"];
 
 let playerNumCardsThrown = {};
 players.forEach((player) => {
-  playerNumCardsThrown[player] = 11;
+  playerNumCardsThrown[player] = 0;
 });
 
 // can change names of players here if we wish.
@@ -37,18 +37,47 @@ class Valid {
 
   // check validity based on turn, see if can return array of boolean, and the specific thing that is invalid if any.
   validFirstTurn() {
-    if (this.currentRound.type === "first") {
-      return this.validCount() && this.cards.includes("3D") && this.validCards();
+    let bool = true;
+    let msg = "";
+
+    if (this.currentRound.type === "first" && !this.cards.includes("3D")) {
+      bool = false;
+      msg = "You must make use of the 3 of Diamonds in the first turn of the first round";
+    } else if (!this.validCount()) {
+      bool = false;
+      msg = "You can only play 1, 2 or 5 cards";
+    } else if (!this.validCards()) {
+      bool = false;
+      if (this.num === 2) {
+        msg = "Both cards must have the same value";
+      } else {
+        msg =
+          "You must play one of the following: Straight, Flush, Full House, Four Of A Kind or Straight Flush";
+      }
     }
-    return this.validCount() && this.validCards();
+    return [bool, msg];
   }
 
   validGenericTurn() {
-    return (
-      this.num === this.currentRound.numCardsAllowed &&
-      this.validCards() &&
-      this.validBeatsOpponent()
-    );
+    let bool = true;
+    let msg = "";
+
+    if (this.num !== this.currentRound.numCardsAllowed) {
+      bool = false;
+      msg = `You must play ${this.currentRound.numCardsAllowed} cards in this round`;
+    } else if (!this.validCards()) {
+      bool = false;
+      if (this.num === 2) {
+        msg = "Both cards must have the same value";
+      } else {
+        msg =
+          "You must play one of the following: Straight, Flush, Full House, Four Of A Kind or Straight Flush";
+      }
+    } else if (!this.validBeatsOpponent()) {
+      bool = false;
+      msg = "This set of cards is not higher ranked than the one in the previous turn";
+    }
+    return [bool, msg];
   }
 
   // check if the number of cards are valid (used for first turn)
@@ -283,13 +312,11 @@ class BigTwoGame {
         toCheck = checkValidity.validGenericTurn();
       }
 
-      if (toCheck) {
+      if (toCheck[0]) {
         this.currentRound.addToPlayingPile(selectedCardsCodes);
         this.currentRound.numPasses = 0; // actually unnecessary if first turn, since it's alr 0
       } else {
-        this.currentRound.setInstructionsInDOM(
-          `This is an invalid selection, ${nameOfPlayerHittingButton}!`
-        );
+        this.currentRound.setInstructionsInDOM(`${toCheck[1]}, ${nameOfPlayerHittingButton}!`);
       }
     }
   }
