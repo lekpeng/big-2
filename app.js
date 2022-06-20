@@ -90,18 +90,18 @@ class Valid {
     if (this.num === 2) {
       return this.validSameValue();
     } else if (this.num === 5) {
-      return this.validFiveCard();
+      return this.validFiveCards();
     }
     return true;
   }
 
-  validFiveCard() {
+  validFiveCards() {
     return (
-      validStraight() ||
-      validFlush() ||
-      validFullHouse() ||
-      validFourOfAKind() ||
-      validStraightFlush()
+      this.validStraight() ||
+      this.validFlush() ||
+      this.validFullHouse() ||
+      this.validFourOfAKind() ||
+      this.validStraightFlush()
     );
   }
 
@@ -112,41 +112,48 @@ class Valid {
     return cardsArr.every((code) => code[0] === numberToMatch);
   }
 
-  validStraight() {
-    const cardValues = this.cards.map((code) => valuesRank[code[0]]);
-    const sortedValues = cardValues.sort();
+  validStraight(cardsArr = this.cards) {
+    const cardValues = cardsArr.map((code) => valuesRank[code[0]]);
+    const sortedValues = cardValues.sort((a, b) => a - b);
+
     if (cardValues.includes(15)) {
+      const arrayToCompareFirst = [3, 4, 5, 6, 15];
+      const arrayToCompareSecond = [3, 4, 5, 14, 15];
       // equivalent to having cards 2,3,4,5,6 or A,2,3,4,5
-      return sortedValues === [3, 4, 5, 6, 15] || sortedValues === [3, 4, 5, 14, 15];
+      return (
+        sortedValues.every((value, index) => value === arrayToCompareFirst[index]) ||
+        sortedValues.every((value, index) => value === arrayToCompareSecond[index])
+      );
     }
     const minVal = Math.min(...cardValues);
-    return sortedValues === [...Array(5).keys()].map((i) => i + minVal);
+    const arrayToCompare = [...Array(5).keys()].map((i) => i + minVal);
+    return sortedValues.every((value, index) => value === arrayToCompare[index]);
   }
 
-  validFlush() {
-    const suitToMatch = this.cards[0][1];
-    return this.cards.every((code) => code[1] === suitToMatch);
+  validFlush(cardsArr = this.cards) {
+    const suitToMatch = cardsArr[0][1];
+    return cardsArr.every((code) => code[1] === suitToMatch);
   }
 
-  validFullHouse() {
-    const cardNums = this.cards.map((code) => [code[0]]);
-    const sortedNums = cardNums.sort();
+  validFullHouse(cardsArr = this.cards) {
+    const cardNums = cardsArr.map((code) => [code[0]]);
+    const sortedNums = cardNums.sort(); // generic sort will do here
     return (
       (this.validSameValue(sortedNums.slice(0, 2)) && this.validSameValue(sortedNums.slice(2))) ||
       (this.validSameValue(sortedNums.slice(0, 3)) && this.validSameValue(sortedNums.slice(3)))
     );
   }
 
-  validFourOfAKind() {
-    const cardNums = this.cards.map((code) => [code[0]]);
-    const sortedNums = cardNums.sort();
-    return this.validSameValue(
-      sortedNums.slice(0, 4) || this.validSameValue(sortedNums.slice(1, 5))
+  validFourOfAKind(cardsArr = this.cards) {
+    const cardNums = cardsArr.map((code) => [code[0]]);
+    const sortedNums = cardNums.sort(); // generic sort will do here
+    return (
+      this.validSameValue(sortedNums.slice(0, 4)) || this.validSameValue(sortedNums.slice(1, 5))
     );
   }
 
-  validStraightFlush() {
-    return this.validFlush() && validStraight();
+  validStraightFlush(cardsArr = this.cards) {
+    return this.validFlush(cardsArr) && this.validStraight(cardsArr);
   }
 
   // assuming cards are valid, check if the cards beat the cards from the previous turn
@@ -157,24 +164,115 @@ class Valid {
   }
 
   validBeatsOpponent() {
+    if (this.num === 1 || this.num === 2) {
+      return this.validBeatsOpponent1Or2Cards();
+    }
+    console.log("calling valid for 5 cards");
+    return this.validBeatsOpponent5Cards();
+  }
+
+  validBeatsOpponent1Or2Cards(
+    num = this.num,
+    cards = this.cards,
+    cardsToBeat = this.currentRound.cardsToBeat
+  ) {
     let valueToBeatRank, suitToBeatRank;
-    [valueToBeatRank, suitToBeatRank] = this.cardCodeToRank(this.currentRound.cardsToBeat[0]);
+    [valueToBeatRank, suitToBeatRank] = this.cardCodeToRank(cardsToBeat[0]);
 
     let valueRankFirstCard, suitRankFirstCard;
-    [valueRankFirstCard, suitRankFirstCard] = this.cardCodeToRank(this.cards[0]);
+    [valueRankFirstCard, suitRankFirstCard] = this.cardCodeToRank(cards[0]);
 
-    if (this.num === 1) {
+    if (num === 1) {
       return (
         valueRankFirstCard > valueToBeatRank ||
         (valueRankFirstCard === valueToBeatRank && suitRankFirstCard > suitToBeatRank)
       );
-    }
-
-    if (this.num === 2) {
+    } else if (num === 2) {
       let valueRankSecond, suitRankSecond;
-      [valueRankSecond, suitRankSecond] = this.cardCodeToRank(this.cards[1]);
+      [valueRankSecond, suitRankSecond] = this.cardCodeToRank(cards[1]);
       return (
         valueRankFirstCard > valueToBeatRank || suitRankFirstCard === 4 || suitRankSecond === 4
+      );
+    }
+  }
+
+  typeFiveCards(cardsArr = this.cards()) {
+    if (this.validStraightFlush(cardsArr)) {
+      return "straightflush";
+    } else if (this.validStraight(cardsArr)) {
+      return "straight";
+    } else if (this.validFlush(cardsArr)) {
+      return "flush";
+    } else if (this.validFullHouse(cardsArr)) {
+      return "fullhouse";
+    } else {
+      return "fourofakind";
+    }
+  }
+
+  getTriple(sortedCardsArr) {
+    if (sortedCardsArr[0][0] === sortedCardsArr[2][0]) {
+      return sortedCardsArr[0];
+    }
+    return sortedCardsArr[2];
+  }
+
+  getQuadruple(sortedCardsArr) {
+    if (sortedCardsArr[0][0] === sortedCardsArr[3][0]) {
+      return sortedCardsArr[0];
+    }
+    return sortedCardsArr[3];
+  }
+
+  validBeatsOpponent5Cards() {
+    const fiveCardsRank = {
+      straight: 1, //take max card for both and compare like single cards
+      flush: 2, // look at suit rank, if same suit then take take max card for both and compare like single cards
+      fullhouse: 3, // look at triple card value
+      fourofakind: 4, // look at quadruple card value
+      straightflush: 5, // same as straight
+    };
+
+    const fiveCardsRankToBeat = fiveCardsRank[this.typeFiveCards(this.currentRound.cardsToBeat)];
+    const fiveCardsRankCurrPlayer = fiveCardsRank[this.typeFiveCards(this.cards)];
+
+    console.log("fiveCardsRankToBeat", fiveCardsRankToBeat);
+    console.log("fiveCardsRankCurrPlayer", fiveCardsRankCurrPlayer);
+
+    if (fiveCardsRankCurrPlayer !== fiveCardsRankToBeat) {
+      return fiveCardsRankCurrPlayer > fiveCardsRankToBeat;
+    }
+
+    [this.currentRound.cardsToBeat, this.cards].forEach((cards) => {
+      cards.sort((a, b) => suitsRank[a[1]] - suitsRank[b[1]]);
+      cards.sort((a, b) => valuesRank[a[0]] - valuesRank[b[0]]);
+    });
+
+    if (fiveCardsRankToBeat === 1 || fiveCardsRankToBeat === 5) {
+      // comparing straights
+      return this.validBeatsOpponent1Or2Cards(1, this.cards[4], this.currentRound.cardsToBeat[4]);
+    } else if (fiveCardsRankToBeat === 2) {
+      // comparing flushes
+      const suitsRankToBeat = suitsRank[this.currentRound.cardsToBeat[0][1]];
+      const suitsRankCurrPlayer = suitsRank[this.cards[0][1]];
+
+      if (suitsRankCurrPlayer !== suitsRankToBeat) {
+        return suitsRankCurrPlayer > suitsRankToBeat;
+      }
+      return valuesRank[this.cards[4][0]] > valuesRank[this.currentRound.cardsToBeat[4][0]];
+    } else if (fiveCardsRankToBeat === 3) {
+      // comparing full houses
+      return this.validBeatsOpponent1Or2Cards(
+        1,
+        this.getTriple(this.cards),
+        this.getTriple(this.currentRound.cardsToBeat)
+      );
+    } else {
+      // comparing four of a kinds
+      return this.validBeatsOpponent1Or2Cards(
+        1,
+        this.getQuadruple(this.cards),
+        this.getQuadruple(this.currentRound.cardsToBeat)
       );
     }
   }

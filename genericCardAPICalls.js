@@ -62,6 +62,8 @@ async function addCardsToPlayingPile(cardCodes) {
   );
 
   // add to playing pile in DOM
+  cardCodes.sort((a, b) => suitsRank[a[1]] - suitsRank[b[1]]);
+  cardCodes.sort((a, b) => valuesRank[a[0]] - valuesRank[b[0]]);
   cardCodes.forEach((cardCode) => {
     const imgElm = document.querySelector(`[id="${cardCode}"]`);
     playingPileContainer.appendChild(imgElm);
