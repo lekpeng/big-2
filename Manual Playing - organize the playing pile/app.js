@@ -1,4 +1,5 @@
-// MAKE COM 1-3 ACTUAL ROBOTS => Work on CSS
+// REFLECT SPECIFIC FEEDBACK FOR INVALID SELECTION => ADD 5 CARD COMBIS AND WINNING CONDITIONS
+// => MAKE COM 1-3 ACTUAL ROBOTS
 
 // CONST VARIABLES
 const playerHandsCodesOnly = {}; //array of card objects
@@ -25,23 +26,6 @@ players.forEach((player) => {
 const instructionsContainer = document.querySelector("#instructions");
 const handCardsContainers = document.querySelectorAll(".hand-container");
 const playingPileContainer = document.querySelector("#playing-pile-container");
-
-class Computer {
-  constructor(id) {
-    this.id = id;
-    this.initialCardCodes;
-    this.singles = [];
-    this.doubles = [];
-    this.fiveCards = [];
-  }
-
-  partitionCards() {
-    const cardNodes = document.querySelectorAll(`${id}-holding cards`);
-    const cardsArr = [...cardNodes];
-    cardsArr.sort((a, b) => suitsRank[a[1]] - suitsRank[b[1]]);
-    cardsArr.sort((a, b) => valuesRank[a[0]] - valuesRank[b[0]]);
-  }
-}
 
 class Valid {
   constructor(cards, currentRound) {
@@ -396,8 +380,9 @@ class BigTwoGame {
       document.querySelector(`[id="${code}"]`).title = "unselected";
     });
 
-    const nameOfPlayerHittingButton = playersToPlayerNamesMapping[event.target.parentNode.id];
-    if (event.target.parentNode.id !== this.currentRound.turn) {
+    const idOfPlayerHittingButton = event.target.parentNode.parentNode.parentNode.id;
+    const nameOfPlayerHittingButton = playersToPlayerNamesMapping[idOfPlayerHittingButton];
+    if (idOfPlayerHittingButton !== this.currentRound.turn) {
       this.currentRound.setInstructionsInDOM(`Not your turn, ${nameOfPlayerHittingButton}!`);
       return;
     }

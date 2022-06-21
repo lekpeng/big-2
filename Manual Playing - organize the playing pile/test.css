@@ -1,0 +1,119 @@
+:root {
+  --w: 80em;
+  --h: var(--w);
+  --ph: 12em;
+  --p1: 180deg;
+  --p2: 270deg;
+  --p3: 0deg;
+  --p4: 90deg;
+}
+
+body {
+  margin: auto;
+  width: var(--w);
+  font-family: "Arial", Helvetica, sans-serif;
+}
+
+.board {
+  position: relative;
+  width: var(--w);
+  height: var(--h);
+}
+
+.player {
+  width: calc(var(--w) - var(--ph));
+  height: var(--ph);
+  transform-origin: calc(var(--ph) / 2) calc(var(--ph) / 2);
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.player-name-and-pass-play-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.sort-buttons {
+  text-align: right;
+}
+
+img.cards {
+  width: 80px;
+  padding: 0 5px;
+  cursor: pointer;
+}
+
+.cards[title="selected"] {
+  box-shadow: 0 0 10px 5px black;
+}
+
+.cards[title="unselected"] {
+  box-shadow: none;
+}
+
+.hand-container {
+  text-align: center;
+  margin: 1em 0;
+  /* so that we can order cards */
+  display: flex;
+  justify-content: center;
+}
+
+#instructions {
+  color: white;
+  font-style: italic;
+  font-size: 1.5em;
+  background-color: grey;
+}
+
+#center-board {
+  --d: calc(var(--w) - calc(2 * var(--ph)));
+  position: absolute;
+  top: var(--ph);
+  left: var(--ph);
+  width: var(--d);
+  height: var(--d);
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+}
+
+#instructions-and-playing-pile {
+  width: 100%;
+}
+
+#playing-pile-container {
+  padding: 1em 0;
+  background-color: maroon;
+  overflow: hidden;
+  height: 300px;
+  align-items: center;
+}
+
+.player:nth-child(1) {
+  --xp: calc(var(--ph) - var(--w));
+  transform: rotate(var(--p1)) translate(var(--xp), 0);
+  background-color: yellow;
+}
+
+.player:nth-child(2) {
+  --xp: calc(calc(2 * var(--ph)) - var(--w));
+  --yp: calc(var(--w) - var(--ph));
+  transform: rotate(var(--p2)) translate(var(--xp), var(--yp));
+  background-color: skyblue;
+}
+
+.player:nth-child(3) {
+  --yp: calc(var(--w) - calc(3 * var(--ph)));
+  transform: rotate(var(--p3)) translate(0, var(--yp));
+  background-color: rgb(95, 255, 95);
+}
+
+.player:nth-child(4) {
+  --xp: calc(0em - calc(3 * var(--ph)));
+  transform: rotate(var(--p4)) translate(var(--xp), 0em);
+  background-color: pink;
+}

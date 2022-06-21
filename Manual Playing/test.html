@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="test.css" />
+    <title>Play Big 2!</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="board">
+        <div class="players">
+          <!-- COM 2 -->
+          <div id="com-2" class="player">
+            <div class="player-name-and-pass-play-buttons">
+              <h5 class="player-name">COM 2</h5>
+              <div class="play-pass-buttons">
+                <button class="play" type="button">Play</button>
+                <button class="pass" type="button">Pass</button>
+              </div>
+            </div>
+
+            <div id="com-2-hand-container" class="hand-container"></div>
+            <div class="sort-buttons">
+              <button class="sort-number" type="button">Sort By Value</button>
+              <button class="sort-suit" type="button">Sort By Suit</button>
+            </div>
+          </div>
+
+          <!-- COM 3 -->
+          <div id="com-3" class="player">
+            <div class="player-name-and-pass-play-buttons">
+              <h5 class="player-name">COM 3</h5>
+              <div class="play-pass-buttons">
+                <button class="play" type="button">Play</button>
+                <button class="pass" type="button">Pass</button>
+              </div>
+            </div>
+            <div id="com-3-hand-container" class="hand-container"></div>
+            <div class="sort-buttons">
+              <button class="sort-number" type="button">Sort By Value</button>
+              <button class="sort-suit" type="button">Sort By Suit</button>
+            </div>
+          </div>
+
+          <!-- PLAYER -->
+          <div id="player" class="player">
+            <div class="player-name-and-pass-play-buttons">
+              <h5 class="player-name">PLAYER</h5>
+              <div class="play-pass-buttons">
+                <button class="play" type="button">Play</button>
+                <button class="pass" type="button">Pass</button>
+              </div>
+            </div>
+            <div id="player-hand-container" class="hand-container"></div>
+            <div class="sort-buttons">
+              <button class="sort-number" type="button">Sort By Value</button>
+              <button class="sort-suit" type="button">Sort By Suit</button>
+            </div>
+          </div>
+
+          <!-- COM 1 -->
+          <div id="com-1" class="player">
+            <div class="player-name-and-pass-play-buttons">
+              <h5 class="player-name">COM 1</h5>
+              <div class="play-pass-buttons">
+                <button class="play" type="button">Play</button>
+                <button class="pass" type="button">Pass</button>
+              </div>
+            </div>
+            <div id="com-1-hand-container" class="hand-container"></div>
+            <div class="sort-buttons">
+              <button class="sort-number" type="button">Sort By Value</button>
+              <button class="sort-suit" type="button">Sort By Suit</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PLAYING PILE -->
+        <div id="center-board" class="border text-center">
+          <!-- INSTRUCTIONS -->
+          <div id="instructions-and-playing-pile">
+            <div id="instructions">Welcome to Big 2! Please wait while we distribute the cards</div>
+            <div id="playing-pile-container"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+      crossorigin="anonymous"
+    ></script>
+    <script src="genericAndAPIFuncs.js"></script>
+    <script src="genericCardAPICalls.js"></script>
+    <script src="eventListenerSorting.js"></script>
+    <script src="eventListenerPlayingPile.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
