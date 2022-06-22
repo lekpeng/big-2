@@ -1,122 +1,126 @@
-// REFLECT SPECIFIC FEEDBACK FOR INVALID SELECTION => ADD 5 CARD COMBIS AND WINNING CONDITIONS
-// => MAKE COM 1-3 ACTUAL ROBOTS
+// This should be unique for each player so that multiple people can play at the same time. Try putting in local cache
+const deckID = "tyu78tcx00jy";
+const urlShuffle = `https://deckofcardsapi.com/api/deck/${deckID}/shuffle/`;
+const urlDraw = `https://deckofcardsapi.com/api/deck/${deckID}/draw/?count=52`;
 
-// CONST VARIABLES
-const playerHandsCodesOnly = {}; //array of card objects
-
-const players = ["player", "com-1", "com-2", "com-3"];
-
+// Will track terminating condition
 let playerNumCardsThrown = {};
 players.forEach((player) => {
   playerNumCardsThrown[player] = 0;
 });
 
-// can change names of players here if we wish.
-let playersToPlayerNamesMapping = {};
-players.forEach((player) => {
-  playersToPlayerNamesMapping[player] = player.toUpperCase().replace("-", " ");
-});
-
-let playersToPilesMapping = {};
-players.forEach((player) => {
-  playersToPilesMapping[player] = player.replace("-", "");
-});
-
-// DOM ELEMENTS
+// DOM Elements
 const instructionsContainer = document.querySelector("#instructions");
 const handCardsContainers = document.querySelectorAll(".hand-container");
 const playingPileContainer = document.querySelector("#playing-pile-container");
+const previousTurnContainer = document.querySelector(".previous-turn-container");
+const currentTurnContainer = document.querySelector(".current-turn-container");
 
+// Checks for validity of player's selection of cards when player clicks "play" button
 class Valid {
   constructor(cards, currentRound) {
-    //cards here is an array of the codes
+    // Cards here is an array of card codes
     this.cards = cards;
-    this.currentRound = currentRound;
     this.num = cards.length;
+    this.currentRound = currentRound;
+    this.cardsTypeIfFiveCard;
   }
 
-  // check validity based on turn, see if can return array of boolean, and the specific thing that is invalid if any.
   validFirstTurn() {
-    let bool = true;
+    let bool = false;
     let msg = "";
 
     if (this.currentRound.type === "first" && !this.cards.includes("3D")) {
-      bool = false;
       msg = "You must make use of the 3 of Diamonds in the first turn of the first round";
     } else if (!this.validCount()) {
-      bool = false;
       msg = "You can only play 1, 2 or 5 cards";
-    } else if (!this.validCards()) {
-      bool = false;
-      if (this.num === 2) {
-        msg = "Both cards must have the same value";
+    } else {
+      const validCardsObj = this.validCards();
+      if (!validCardsObj.valid) {
+        msg = this.messageForInvalidCards();
       } else {
-        msg =
-          "You must play one of the following: Straight, Flush, Full House, Four Of A Kind or Straight Flush";
+        bool = true;
+        this.currentRound.cardsToBeatTypeIfFiveCard = validCardsObj.typeIf5Card;
       }
     }
-    return [bool, msg];
+    return { validTurn: bool, message: msg };
   }
 
   validGenericTurn() {
-    let bool = true;
+    let bool = false;
     let msg = "";
 
     if (this.num !== this.currentRound.numCardsAllowed) {
-      bool = false;
-      msg = `You must play ${this.currentRound.numCardsAllowed} cards in this round`;
-    } else if (!this.validCards()) {
-      bool = false;
-      if (this.num === 2) {
-        msg = "Both cards must have the same value";
+      msg = `You must play ${this.currentRound.numCardsAllowed} card(s) in this round`;
+    } else {
+      const validCardsObj = this.validCards();
+      this.cardsTypeIfFiveCard = validCardsObj.typeIf5Card;
+      if (!validCardsObj.valid) {
+        msg = this.messageForInvalidCards();
+      } else if (!this.validBeatsOpponent()) {
+        msg = "This set of cards is not higher ranked than the one in the previous turn";
       } else {
-        msg =
-          "You must play one of the following: Straight, Flush, Full House, Four Of A Kind or Straight Flush";
+        bool = true;
+        this.currentRound.cardsToBeatTypeIfFiveCard = this.cardsTypeIfFiveCard;
       }
-    } else if (!this.validBeatsOpponent()) {
-      bool = false;
-      msg = "This set of cards is not higher ranked than the one in the previous turn";
     }
-    return [bool, msg];
+    return { validTurn: bool, message: msg };
   }
 
-  // check if the number of cards are valid (used for first turn)
+  // Checks if the number of cards is valid (used for first turn)
   validCount() {
     return this.num === 1 || this.num === 2 || this.num === 5;
   }
 
-  // assuming counts are valid, check if the cards are valid
+  // Assuming the number of cards is valid, check if the cards are valid
   validCards() {
     if (this.num === 2) {
-      return this.validSameValue();
+      return { valid: this.validSameValue(), typeIf5Card: null };
     } else if (this.num === 5) {
       return this.validFiveCards();
+    } // case of single card
+    return { valid: true, typeIf5Card: null };
+  }
+
+  messageForInvalidCards() {
+    if (this.num === 2) {
+      return "Both cards must have the same value";
     }
-    return true;
+    return "You must play one of the following: Straight, Flush, Full House, Four Of A Kind or Straight Flush";
   }
 
-  validFiveCards() {
-    return (
-      this.validStraight() ||
-      this.validFlush() ||
-      this.validFullHouse() ||
-      this.validFourOfAKind() ||
-      this.validStraightFlush()
-    );
-  }
-
-  // can also use this for checking three of a kind and four of a kind
   validSameValue(cardsArr = this.cards) {
-    // get value of first card
+    // Get value of first card
     const numberToMatch = cardsArr[0][0];
     return cardsArr.every((code) => code[0] === numberToMatch);
   }
 
-  validStraight(cardsArr = this.cards) {
-    const cardValues = cardsArr.map((code) => valuesRank[code[0]]);
-    const sortedValues = cardValues.sort((a, b) => a - b);
+  validFiveCards(cardsArr = this.cards) {
+    let type,
+      bool = true;
+    if (this.validStraightFlush(cardsArr)) {
+      type = "straightflush";
+    } else if (this.validStraight(cardsArr)) {
+      type = "straight";
+    } else if (this.validFlush(cardsArr)) {
+      type = "flush";
+    } else if (this.validFullHouse(cardsArr)) {
+      type = "fullhouse";
+    } else if (this.validFourOfAKind(cardsArr)) {
+      type = "fourofakind";
+    } else {
+      bool = false;
+      type = null;
+    }
+    return { valid: bool, typeIf5Card: type };
+  }
 
-    if (cardValues.includes(15)) {
+  validStraight(cardsArr = this.cards) {
+    const sortedValues = cardsArr
+      .map((code) => BigTwoGame.valuesRank[code[0]])
+      .sort((a, b) => a - b);
+
+    if (sortedValues[4] === 15) {
       const arrayToCompareFirst = [3, 4, 5, 6, 15];
       const arrayToCompareSecond = [3, 4, 5, 14, 15];
       // equivalent to having cards 2,3,4,5,6 or A,2,3,4,5
@@ -125,7 +129,7 @@ class Valid {
         sortedValues.every((value, index) => value === arrayToCompareSecond[index])
       );
     }
-    const minVal = Math.min(...cardValues);
+    const minVal = sortedValues[0];
     const arrayToCompare = [...Array(5).keys()].map((i) => i + minVal);
     return sortedValues.every((value, index) => value === arrayToCompare[index]);
   }
@@ -137,7 +141,8 @@ class Valid {
 
   validFullHouse(cardsArr = this.cards) {
     const cardNums = cardsArr.map((code) => [code[0]]);
-    const sortedNums = cardNums.sort(); // generic sort will do here
+    // generic sort will do here as we just want the triple and double to be together
+    const sortedNums = cardNums.sort();
     return (
       (this.validSameValue(sortedNums.slice(0, 2)) && this.validSameValue(sortedNums.slice(2))) ||
       (this.validSameValue(sortedNums.slice(0, 3)) && this.validSameValue(sortedNums.slice(3)))
@@ -146,7 +151,9 @@ class Valid {
 
   validFourOfAKind(cardsArr = this.cards) {
     const cardNums = cardsArr.map((code) => [code[0]]);
-    const sortedNums = cardNums.sort(); // generic sort will do here
+    // generic sort will do here as we just want the quadruple to be together
+    const sortedNums = cardNums.sort();
+
     return (
       this.validSameValue(sortedNums.slice(0, 4)) || this.validSameValue(sortedNums.slice(1, 5))
     );
@@ -160,14 +167,13 @@ class Valid {
   cardCodeToRank(code) {
     let value, suit;
     [value, suit] = code.split("");
-    return [valuesRank[value], suitsRank[suit]];
+    return [BigTwoGame.valuesRank[value], BigTwoGame.suitsRank[suit]];
   }
 
   validBeatsOpponent() {
     if (this.num === 1 || this.num === 2) {
       return this.validBeatsOpponent1Or2Cards();
     }
-    console.log("calling valid for 5 cards");
     return this.validBeatsOpponent5Cards();
   }
 
@@ -196,20 +202,6 @@ class Valid {
     }
   }
 
-  typeFiveCards(cardsArr = this.cards()) {
-    if (this.validStraightFlush(cardsArr)) {
-      return "straightflush";
-    } else if (this.validStraight(cardsArr)) {
-      return "straight";
-    } else if (this.validFlush(cardsArr)) {
-      return "flush";
-    } else if (this.validFullHouse(cardsArr)) {
-      return "fullhouse";
-    } else {
-      return "fourofakind";
-    }
-  }
-
   getTriple(sortedCardsArr) {
     if (sortedCardsArr[0][0] === sortedCardsArr[2][0]) {
       return sortedCardsArr[0];
@@ -226,6 +218,7 @@ class Valid {
 
   validBeatsOpponent5Cards() {
     const fiveCardsRank = {
+      // comments explain how to determine validity if both sets are in the same rank
       straight: 1, //take max card for both and compare like single cards
       flush: 2, // look at suit rank, if same suit then take take max card for both and compare like single cards
       fullhouse: 3, // look at triple card value
@@ -233,9 +226,13 @@ class Valid {
       straightflush: 5, // same as straight
     };
 
-    const fiveCardsRankToBeat = fiveCardsRank[this.typeFiveCards(this.currentRound.cardsToBeat)];
-    const fiveCardsRankCurrPlayer = fiveCardsRank[this.typeFiveCards(this.cards)];
-
+    const fiveCardsRankToBeat = fiveCardsRank[this.currentRound.cardsToBeatTypeIfFiveCard];
+    const fiveCardsRankCurrPlayer = fiveCardsRank[this.cardsTypeIfFiveCard];
+    console.log(
+      "this.currentRound.cardsToBeatTypeIfFiveCard",
+      this.currentRound.cardsToBeatTypeIfFiveCard
+    );
+    console.log("this.cardsTypeIfFiveCard", this.cardsTypeIfFiveCard);
     console.log("fiveCardsRankToBeat", fiveCardsRankToBeat);
     console.log("fiveCardsRankCurrPlayer", fiveCardsRankCurrPlayer);
 
@@ -244,8 +241,8 @@ class Valid {
     }
 
     [this.currentRound.cardsToBeat, this.cards].forEach((cards) => {
-      cards.sort((a, b) => suitsRank[a[1]] - suitsRank[b[1]]);
-      cards.sort((a, b) => valuesRank[a[0]] - valuesRank[b[0]]);
+      cards.sort((a, b) => BigTwoGame.suitsRank[a[1]] - BigTwoGame.suitsRank[b[1]]);
+      cards.sort((a, b) => BigTwoGame.valuesRank[a[0]] - BigTwoGame.valuesRank[b[0]]);
     });
 
     if (fiveCardsRankToBeat === 1 || fiveCardsRankToBeat === 5) {
@@ -253,13 +250,16 @@ class Valid {
       return this.validBeatsOpponent1Or2Cards(1, this.cards[4], this.currentRound.cardsToBeat[4]);
     } else if (fiveCardsRankToBeat === 2) {
       // comparing flushes
-      const suitsRankToBeat = suitsRank[this.currentRound.cardsToBeat[0][1]];
-      const suitsRankCurrPlayer = suitsRank[this.cards[0][1]];
+      const suitsRankToBeat = BigTwoGame.suitsRank[this.currentRound.cardsToBeat[0][1]];
+      const suitsRankCurrPlayer = BigTwoGame.suitsRank[this.cards[0][1]];
 
       if (suitsRankCurrPlayer !== suitsRankToBeat) {
         return suitsRankCurrPlayer > suitsRankToBeat;
       }
-      return valuesRank[this.cards[4][0]] > valuesRank[this.currentRound.cardsToBeat[4][0]];
+      return (
+        BigTwoGame.valuesRank[this.cards[4][0]] >
+        BigTwoGame.valuesRank[this.currentRound.cardsToBeat[4][0]]
+      );
     } else if (fiveCardsRankToBeat === 3) {
       // comparing full houses
       return this.validBeatsOpponent1Or2Cards(
@@ -279,28 +279,48 @@ class Valid {
 }
 
 class Round {
-  constructor(type, turn = null) {
+  constructor(type, turn) {
     this.type = type; //takes the value "first" or "normal"
     this.turn = turn; //takes the player IDs
     this.isFirstTurn = true;
     this.numPasses = 0;
     this.cardsToBeat;
+    this.cardsToBeatTypeIfFiveCard;
     this.numCardsAllowed;
   }
   addToPlayingPile(cardsArr) {
-    // api call
-    addCardsToPlayingPile(cardsArr);
+    // add to playing pile in DOM
+    // remove anything that's in prev turn
+    const prevTurnCards = previousTurnContainer.querySelectorAll(".cards");
+    if (prevTurnCards.length) {
+      prevTurnCards.forEach((cardElm) => cardElm.remove());
+    }
+    // if anything in current turn, push it to previous turn,
+    const currentTurnCards = currentTurnContainer.querySelectorAll(".cards");
+    if (currentTurnCards.length) {
+      currentTurnCards.forEach((cardElm) => previousTurnContainer.appendChild(cardElm));
+    }
+
+    // add set of cards to current turn
+    cardsArr.sort((a, b) => BigTwoGame.suitsRank[a[1]] - BigTwoGame.suitsRank[b[1]]);
+    cardsArr.sort((a, b) => BigTwoGame.valuesRank[a[0]] - BigTwoGame.valuesRank[b[0]]);
+    cardsArr.forEach((cardCode) => {
+      const imgElm = document.querySelector(`[id="${cardCode}"]`);
+      currentTurnContainer.appendChild(imgElm);
+    });
+
+    // setting for next turn and checking if we have a winner
     if (this.isFirstTurn) {
       this.isFirstTurn = false;
       this.numCardsAllowed = cardsArr.length;
     }
     this.cardsToBeat = cardsArr;
+
     playerNumCardsThrown[this.turn] += cardsArr.length;
     if (this.foundWinningPlayer()) {
       this.setInstructionsInDOM(
         `The winner is ${playersToPlayerNamesMapping[this.foundWinningPlayer()]}`
       );
-      // DELETE ALL ELEMENTS and announce winner maybe.
     } else {
       this.setTurnForNextPlayer();
     }
@@ -317,32 +337,26 @@ class Round {
     this.setInstructionsInDOM(`It is now ${playersToPlayerNamesMapping[this.turn]}'s turn!`);
   }
 
-  async findDiamondThreeOwner() {
-    await listAllCards();
-    for (const player of players) {
-      if (playerHandsCodesOnly[player].includes("3D")) {
-        this.turn = player;
-      }
-    }
-  }
-
   async startRound() {
     if (this.type === "first") {
-      await this.findDiamondThreeOwner();
       this.setInstructionsInDOM(
         `${
           playersToPlayerNamesMapping[this.turn]
-        } is holding the 3 of Diamonds and should start the game.`
+        } is holding the 3 of Diamonds and\nshould start the game.`
       );
     } else {
       this.setInstructionsInDOM(
-        `Everyone passed after ${playersToPlayerNamesMapping[this.turn]}'s previous turn, so ${
+        `Everyone passed after ${playersToPlayerNamesMapping[this.turn]}'s previous turn,\nso ${
           playersToPlayerNamesMapping[this.turn]
         } is free to start a new round!`
       );
       const cardsNodes = playingPileContainer.querySelectorAll("[class$='holding cards']");
       const cardsArr = [...cardsNodes].map((elm) => elm.id);
-      discardPlayingPile(cardsArr);
+      // remove from playing pile in DOM
+      cardsArr.forEach((cardCode) => {
+        const imgElm = document.querySelector(`[id="${cardCode}"]`);
+        imgElm.remove();
+      });
     }
   }
 
@@ -352,10 +366,86 @@ class Round {
 }
 
 class BigTwoGame {
+  static suitsRank = {
+    D: 1,
+    C: 2,
+    H: 3,
+    S: 4,
+  };
+
+  static valuesRank = {
+    3: 3,
+    4: 4,
+    5: 5,
+    6: 6,
+    7: 7,
+    8: 8,
+    9: 9,
+    0: 10,
+    J: 11,
+    Q: 12,
+    K: 13,
+    A: 14,
+    2: 15,
+  };
+
   constructor() {
     this.currentRound;
+    this.ownerOf3D;
+    this.orderMapping = {};
   }
 
+  async distributeCards() {
+    // shuffle and draw all cards
+    await fetchDataAsync(urlShuffle);
+    const data = await fetchDataAsync(urlDraw);
+    const allCards = data.cards;
+
+    // distribute cards to players
+    for (const [index, player] of players.entries()) {
+      const quarterOfCards = allCards.slice(index * 13, (index + 1) * 13);
+      const container = document.querySelector(`#${player}-hand-container`);
+      // create card objects in DOM
+      quarterOfCards.forEach((cardObj) => {
+        if (cardObj.code === "3D") {
+          this.ownerOf3D = player;
+        }
+        container.appendChild(
+          elementCreator("img", {
+            src: cardObj.image,
+            className: `${player}-holding cards`,
+            id: cardObj.code,
+          })
+        );
+      });
+    }
+  }
+  sortCards(type, event) {
+    const imgNodeList = event.target.parentNode.parentNode.querySelectorAll(
+      "[class$='holding cards']"
+    );
+    const codesOfCurrentOrder = [...imgNodeList].map((imgElm) => imgElm.id);
+    const copyOfCodesToSort = [...codesOfCurrentOrder];
+
+    if (type === "suit") {
+      // sort by values then suits
+      copyOfCodesToSort.sort((a, b) => BigTwoGame.valuesRank[a[0]] - BigTwoGame.valuesRank[b[0]]);
+      copyOfCodesToSort.sort((a, b) => BigTwoGame.suitsRank[a[1]] - BigTwoGame.suitsRank[b[1]]);
+    } else {
+      // sort by suits then values
+      copyOfCodesToSort.sort((a, b) => BigTwoGame.suitsRank[a[1]] - BigTwoGame.suitsRank[b[1]]);
+      copyOfCodesToSort.sort((a, b) => BigTwoGame.valuesRank[a[0]] - BigTwoGame.valuesRank[b[0]]);
+    }
+
+    codesOfCurrentOrder.forEach((code) => {
+      this.orderMapping[code] = copyOfCodesToSort.indexOf(code);
+    });
+
+    // reordering the cards using order attribute of flexbox
+    imgNodeList.forEach((imgElm) => {
+      imgElm.style.order = this.orderMapping[imgElm.id];
+    });
+  }
   toggleCardSelection(event) {
     const cardElm = event.target;
     // return if not player's turn
@@ -411,19 +501,28 @@ class BigTwoGame {
         toCheck = checkValidity.validGenericTurn();
       }
 
-      if (toCheck[0]) {
+      if (toCheck.validTurn) {
         this.currentRound.addToPlayingPile(selectedCardsCodes);
         this.currentRound.numPasses = 0; // actually unnecessary if first turn, since it's alr 0
       } else {
-        this.currentRound.setInstructionsInDOM(`${toCheck[1]}, ${nameOfPlayerHittingButton}!`);
+        this.currentRound.setInstructionsInDOM(`${toCheck.message}, ${nameOfPlayerHittingButton}!`);
       }
     }
   }
 
   async startGame() {
-    await distributeCards();
-    this.currentRound = new Round("first");
+    await this.distributeCards();
+    this.currentRound = new Round("first", this.ownerOf3D);
     this.currentRound.startRound();
+
+    // EVENT LISTENERS FOR SORTING BUTTONS
+    document.querySelectorAll(".sort-number").forEach((sortNumButton) => {
+      sortNumButton.addEventListener("click", (event) => this.sortCards("num", event));
+    });
+
+    document.querySelectorAll(".sort-suit").forEach((sortSuitButton) => {
+      sortSuitButton.addEventListener("click", (event) => this.sortCards("suit", event));
+    });
 
     // EVENT LISTENERS FOR CARDS CLICKING (the green light only appears when it's your turn)
     handCardsContainers.forEach((handCardsContainer) => {
