@@ -11,7 +11,6 @@ players.forEach((player) => {
 
 // DOM Elements
 const instructionsContainer = document.querySelector("#instructions");
-const handCardsContainers = document.querySelectorAll(".hand-container");
 const playingPileContainer = document.querySelector("#playing-pile-container");
 const previousTurnContainer = document.querySelector(".previous-turn-container");
 const currentTurnContainer = document.querySelector(".current-turn-container");
@@ -78,7 +77,7 @@ class Valid {
       return { valid: this.validSameValue(), typeIf5Card: null };
     } else if (this.num === 5) {
       return this.validFiveCards();
-    } // case of single card
+    } // Case of single card
     return { valid: true, typeIf5Card: null };
   }
 
@@ -96,8 +95,8 @@ class Valid {
   }
 
   validFiveCards(cardsArr = this.cards) {
-    let type,
-      bool = true;
+    let type;
+    let bool = true;
     if (this.validStraightFlush(cardsArr)) {
       type = "straightflush";
     } else if (this.validStraight(cardsArr)) {
@@ -120,10 +119,11 @@ class Valid {
       .map((code) => BigTwoGame.valuesRank[code[0]])
       .sort((a, b) => a - b);
 
+    // Edge case when largest card is a 2
     if (sortedValues[4] === 15) {
       const arrayToCompareFirst = [3, 4, 5, 6, 15];
       const arrayToCompareSecond = [3, 4, 5, 14, 15];
-      // equivalent to having cards 2,3,4,5,6 or A,2,3,4,5
+      // Equivalent to having cards 2,3,4,5,6 or A,2,3,4,5
       return (
         sortedValues.every((value, index) => value === arrayToCompareFirst[index]) ||
         sortedValues.every((value, index) => value === arrayToCompareSecond[index])
@@ -141,7 +141,7 @@ class Valid {
 
   validFullHouse(cardsArr = this.cards) {
     const cardNums = cardsArr.map((code) => [code[0]]);
-    // generic sort will do here as we just want the triple and double to be together
+    // Generic sort will do here as we just want the triple and double to be together
     const sortedNums = cardNums.sort();
     return (
       (this.validSameValue(sortedNums.slice(0, 2)) && this.validSameValue(sortedNums.slice(2))) ||
@@ -151,7 +151,7 @@ class Valid {
 
   validFourOfAKind(cardsArr = this.cards) {
     const cardNums = cardsArr.map((code) => [code[0]]);
-    // generic sort will do here as we just want the quadruple to be together
+    // Generic sort will do here as we just want the quadruple to be together
     const sortedNums = cardNums.sort();
 
     return (
@@ -163,13 +163,7 @@ class Valid {
     return this.validFlush(cardsArr) && this.validStraight(cardsArr);
   }
 
-  // assuming cards are valid, check if the cards beat the cards from the previous turn
-  cardCodeToRank(code) {
-    let value, suit;
-    [value, suit] = code.split("");
-    return [BigTwoGame.valuesRank[value], BigTwoGame.suitsRank[suit]];
-  }
-
+  // Assuming cards are valid, check if the cards beat the cards from the previous turn
   validBeatsOpponent() {
     if (this.num === 1 || this.num === 2) {
       return this.validBeatsOpponent1Or2Cards();
@@ -177,28 +171,32 @@ class Valid {
     return this.validBeatsOpponent5Cards();
   }
 
+  cardCodeToRank(code) {
+    let value, suit;
+    [value, suit] = code.split("");
+    return [BigTwoGame.valuesRank[value], BigTwoGame.suitsRank[suit]];
+  }
+
   validBeatsOpponent1Or2Cards(
     num = this.num,
     cards = this.cards,
     cardsToBeat = this.currentRound.cardsToBeat
   ) {
-    let valueToBeatRank, suitToBeatRank;
-    [valueToBeatRank, suitToBeatRank] = this.cardCodeToRank(cardsToBeat[0]);
+    let valueRankToBeat, suitRankToBeat;
+    [valueRankToBeat, suitRankToBeat] = this.cardCodeToRank(cardsToBeat[0]);
 
-    let valueRankFirstCard, suitRankFirstCard;
-    [valueRankFirstCard, suitRankFirstCard] = this.cardCodeToRank(cards[0]);
+    let valueRankFirst, suitRankFirst;
+    [valueRankFirst, suitRankFirst] = this.cardCodeToRank(cards[0]);
 
     if (num === 1) {
       return (
-        valueRankFirstCard > valueToBeatRank ||
-        (valueRankFirstCard === valueToBeatRank && suitRankFirstCard > suitToBeatRank)
+        valueRankFirst > valueRankToBeat ||
+        (valueRankFirst === valueRankToBeat && suitRankFirst > suitRankToBeat)
       );
     } else if (num === 2) {
       let valueRankSecond, suitRankSecond;
       [valueRankSecond, suitRankSecond] = this.cardCodeToRank(cards[1]);
-      return (
-        valueRankFirstCard > valueToBeatRank || suitRankFirstCard === 4 || suitRankSecond === 4
-      );
+      return valueRankFirst > valueRankToBeat || suitRankFirst === 4 || suitRankSecond === 4;
     }
   }
 
@@ -217,39 +215,23 @@ class Valid {
   }
 
   validBeatsOpponent5Cards() {
-    const fiveCardsRank = {
-      // comments explain how to determine validity if both sets are in the same rank
-      straight: 1, //take max card for both and compare like single cards
-      flush: 2, // look at suit rank, if same suit then take take max card for both and compare like single cards
-      fullhouse: 3, // look at triple card value
-      fourofakind: 4, // look at quadruple card value
-      straightflush: 5, // same as straight
-    };
-
-    const fiveCardsRankToBeat = fiveCardsRank[this.currentRound.cardsToBeatTypeIfFiveCard];
-    const fiveCardsRankCurrPlayer = fiveCardsRank[this.cardsTypeIfFiveCard];
-    console.log(
-      "this.currentRound.cardsToBeatTypeIfFiveCard",
-      this.currentRound.cardsToBeatTypeIfFiveCard
-    );
-    console.log("this.cardsTypeIfFiveCard", this.cardsTypeIfFiveCard);
-    console.log("fiveCardsRankToBeat", fiveCardsRankToBeat);
-    console.log("fiveCardsRankCurrPlayer", fiveCardsRankCurrPlayer);
+    const fiveCardsRankToBeat =
+      BigTwoGame.fiveCardsRank[this.currentRound.cardsToBeatTypeIfFiveCard];
+    const fiveCardsRankCurrPlayer = BigTwoGame.fiveCardsRank[this.cardsTypeIfFiveCard];
 
     if (fiveCardsRankCurrPlayer !== fiveCardsRankToBeat) {
       return fiveCardsRankCurrPlayer > fiveCardsRankToBeat;
     }
 
-    [this.currentRound.cardsToBeat, this.cards].forEach((cards) => {
-      cards.sort((a, b) => BigTwoGame.suitsRank[a[1]] - BigTwoGame.suitsRank[b[1]]);
-      cards.sort((a, b) => BigTwoGame.valuesRank[a[0]] - BigTwoGame.valuesRank[b[0]]);
-    });
+    [this.currentRound.cardsToBeat, this.cards].forEach((codesArr) =>
+      BigTwoGame.sortCodesArr("value", codesArr)
+    );
 
     if (fiveCardsRankToBeat === 1 || fiveCardsRankToBeat === 5) {
-      // comparing straights
+      // Comparing straights flushes and straights
       return this.validBeatsOpponent1Or2Cards(1, this.cards[4], this.currentRound.cardsToBeat[4]);
     } else if (fiveCardsRankToBeat === 2) {
-      // comparing flushes
+      // Comparing flushes
       const suitsRankToBeat = BigTwoGame.suitsRank[this.currentRound.cardsToBeat[0][1]];
       const suitsRankCurrPlayer = BigTwoGame.suitsRank[this.cards[0][1]];
 
@@ -261,14 +243,14 @@ class Valid {
         BigTwoGame.valuesRank[this.currentRound.cardsToBeat[4][0]]
       );
     } else if (fiveCardsRankToBeat === 3) {
-      // comparing full houses
+      // Comparing full houses
       return this.validBeatsOpponent1Or2Cards(
         1,
         this.getTriple(this.cards),
         this.getTriple(this.currentRound.cardsToBeat)
       );
     } else {
-      // comparing four of a kinds
+      // Comparing four of a kinds
       return this.validBeatsOpponent1Or2Cards(
         1,
         this.getQuadruple(this.cards),
@@ -280,43 +262,38 @@ class Valid {
 
 class Round {
   constructor(type, turn) {
-    this.type = type; //takes the value "first" or "normal"
-    this.turn = turn; //takes the player IDs
+    this.type = type; // Takes the value "first" or "normal"
+    this.turn = turn; // Takes the player IDs
     this.isFirstTurn = true;
     this.numPasses = 0;
     this.cardsToBeat;
     this.cardsToBeatTypeIfFiveCard;
     this.numCardsAllowed;
   }
-  addToPlayingPile(cardsArr) {
-    // add to playing pile in DOM
-    // remove anything that's in prev turn
-    const prevTurnCards = previousTurnContainer.querySelectorAll(".cards");
-    if (prevTurnCards.length) {
-      prevTurnCards.forEach((cardElm) => cardElm.remove());
-    }
-    // if anything in current turn, push it to previous turn,
-    const currentTurnCards = currentTurnContainer.querySelectorAll(".cards");
-    if (currentTurnCards.length) {
-      currentTurnCards.forEach((cardElm) => previousTurnContainer.appendChild(cardElm));
-    }
 
-    // add set of cards to current turn
-    cardsArr.sort((a, b) => BigTwoGame.suitsRank[a[1]] - BigTwoGame.suitsRank[b[1]]);
-    cardsArr.sort((a, b) => BigTwoGame.valuesRank[a[0]] - BigTwoGame.valuesRank[b[0]]);
+  addToPlayingPile(cardsArr) {
+    // Remove anything that's in prev turn
+    previousTurnContainer.querySelectorAll(".cards").forEach((cardElm) => cardElm.remove());
+
+    // If anything in current turn, push it to previous turn,
+    currentTurnContainer
+      .querySelectorAll(".cards")
+      .forEach((cardElm) => previousTurnContainer.appendChild(cardElm));
+
+    // Sort and add set of cards to current turn
+    BigTwoGame.sortCodesArr("value", cardsArr);
     cardsArr.forEach((cardCode) => {
-      const imgElm = document.querySelector(`[id="${cardCode}"]`);
-      currentTurnContainer.appendChild(imgElm);
+      currentTurnContainer.appendChild(document.querySelector(`[id="${cardCode}"]`));
     });
 
-    // setting for next turn and checking if we have a winner
+    // Setting for next turn and checking if we have a winner
     if (this.isFirstTurn) {
       this.isFirstTurn = false;
       this.numCardsAllowed = cardsArr.length;
     }
     this.cardsToBeat = cardsArr;
-
     playerNumCardsThrown[this.turn] += cardsArr.length;
+
     if (this.foundWinningPlayer()) {
       this.setInstructionsInDOM(
         `The winner is ${playersToPlayerNamesMapping[this.foundWinningPlayer()]}`
@@ -332,8 +309,7 @@ class Round {
   }
 
   setTurnForNextPlayer() {
-    const currIndex = players.indexOf(this.turn);
-    this.turn = players[(currIndex + 1) % 4];
+    this.turn = players[(players.indexOf(this.turn) + 1) % 4];
     this.setInstructionsInDOM(`It is now ${playersToPlayerNamesMapping[this.turn]}'s turn!`);
   }
 
@@ -352,7 +328,7 @@ class Round {
       );
       const cardsNodes = playingPileContainer.querySelectorAll("[class$='holding cards']");
       const cardsArr = [...cardsNodes].map((elm) => elm.id);
-      // remove from playing pile in DOM
+      // Remove previous round cards from playing pile in DOM
       cardsArr.forEach((cardCode) => {
         const imgElm = document.querySelector(`[id="${cardCode}"]`);
         imgElm.remove();
@@ -389,6 +365,15 @@ class BigTwoGame {
     2: 15,
   };
 
+  static fiveCardsRank = {
+    // Comments explain how to determine validity if both sets are in the same rank
+    straight: 1, // Take largest card for both and compare as single cards
+    flush: 2, // Look at suit rank, if same suit then take take largest card for both and compare as single cards
+    fullhouse: 3, // Look at triple card value
+    fourofakind: 4, // Look at quadruple card value
+    straightflush: 5, // Same as straight
+  };
+
   constructor() {
     this.currentRound;
     this.ownerOf3D;
@@ -396,16 +381,17 @@ class BigTwoGame {
   }
 
   async distributeCards() {
-    // shuffle and draw all cards
+    // Shuffle and draw all cards
     await fetchDataAsync(urlShuffle);
     const data = await fetchDataAsync(urlDraw);
     const allCards = data.cards;
 
-    // distribute cards to players
+    // Distribute cards to players
     for (const [index, player] of players.entries()) {
       const quarterOfCards = allCards.slice(index * 13, (index + 1) * 13);
       const container = document.querySelector(`#${player}-hand-container`);
-      // create card objects in DOM
+
+      // Create card objects in DOM
       quarterOfCards.forEach((cardObj) => {
         if (cardObj.code === "3D") {
           this.ownerOf3D = player;
@@ -420,40 +406,43 @@ class BigTwoGame {
       });
     }
   }
+
+  static sortCodesArr(type, codesArr) {
+    if (type === "value") {
+      codesArr.sort((a, b) => BigTwoGame.suitsRank[a[1]] - BigTwoGame.suitsRank[b[1]]);
+      codesArr.sort((a, b) => BigTwoGame.valuesRank[a[0]] - BigTwoGame.valuesRank[b[0]]);
+    } else {
+      codesArr.sort((a, b) => BigTwoGame.valuesRank[a[0]] - BigTwoGame.valuesRank[b[0]]);
+      codesArr.sort((a, b) => BigTwoGame.suitsRank[a[1]] - BigTwoGame.suitsRank[b[1]]);
+    }
+  }
+
   sortCards(type, event) {
     const imgNodeList = event.target.parentNode.parentNode.querySelectorAll(
       "[class$='holding cards']"
     );
     const codesOfCurrentOrder = [...imgNodeList].map((imgElm) => imgElm.id);
     const copyOfCodesToSort = [...codesOfCurrentOrder];
-
-    if (type === "suit") {
-      // sort by values then suits
-      copyOfCodesToSort.sort((a, b) => BigTwoGame.valuesRank[a[0]] - BigTwoGame.valuesRank[b[0]]);
-      copyOfCodesToSort.sort((a, b) => BigTwoGame.suitsRank[a[1]] - BigTwoGame.suitsRank[b[1]]);
-    } else {
-      // sort by suits then values
-      copyOfCodesToSort.sort((a, b) => BigTwoGame.suitsRank[a[1]] - BigTwoGame.suitsRank[b[1]]);
-      copyOfCodesToSort.sort((a, b) => BigTwoGame.valuesRank[a[0]] - BigTwoGame.valuesRank[b[0]]);
-    }
+    BigTwoGame.sortCodesArr(type, copyOfCodesToSort);
 
     codesOfCurrentOrder.forEach((code) => {
       this.orderMapping[code] = copyOfCodesToSort.indexOf(code);
     });
 
-    // reordering the cards using order attribute of flexbox
+    // Reordering the cards using order attribute of flexbox
     imgNodeList.forEach((imgElm) => {
       imgElm.style.order = this.orderMapping[imgElm.id];
     });
   }
+
   toggleCardSelection(event) {
     const cardElm = event.target;
-    // return if not player's turn
+    // Return if not player's turn
     if (cardElm.className !== `${this.currentRound.turn}-holding cards`) {
       return;
     }
 
-    // if card is not selected, select it
+    // If card is not selected, select it, if it's select then unselect it.
     if (!cardElm.title || cardElm.title === "unselected") {
       cardElm.title = "selected";
     } else {
@@ -487,12 +476,13 @@ class BigTwoGame {
       this.currentRound.setTurnForNextPlayer();
       this.currentRound.numPasses += 1;
 
-      // start a new round when there are three consecutive passes
+      // Start a new round when there are three consecutive passes
       if (this.currentRound.numPasses === 3) {
         this.currentRound = new Round("normal", this.currentRound.turn);
         this.currentRound.startRound();
       }
     } else {
+      // Here, action === "play"
       const checkValidity = new Valid(selectedCardsCodes, this.currentRound);
       let toCheck;
       if (this.currentRound.isFirstTurn) {
@@ -503,7 +493,8 @@ class BigTwoGame {
 
       if (toCheck.validTurn) {
         this.currentRound.addToPlayingPile(selectedCardsCodes);
-        this.currentRound.numPasses = 0; // actually unnecessary if first turn, since it's alr 0
+        // Reset to 0
+        this.currentRound.numPasses = 0;
       } else {
         this.currentRound.setInstructionsInDOM(`${toCheck.message}, ${nameOfPlayerHittingButton}!`);
       }
@@ -515,29 +506,26 @@ class BigTwoGame {
     this.currentRound = new Round("first", this.ownerOf3D);
     this.currentRound.startRound();
 
-    // EVENT LISTENERS FOR SORTING BUTTONS
+    // Event listeners for sorting buttons
     document.querySelectorAll(".sort-number").forEach((sortNumButton) => {
-      sortNumButton.addEventListener("click", (event) => this.sortCards("num", event));
+      sortNumButton.addEventListener("click", (event) => this.sortCards("value", event));
     });
 
     document.querySelectorAll(".sort-suit").forEach((sortSuitButton) => {
       sortSuitButton.addEventListener("click", (event) => this.sortCards("suit", event));
     });
 
-    // EVENT LISTENERS FOR CARDS CLICKING (the green light only appears when it's your turn)
-    handCardsContainers.forEach((handCardsContainer) => {
+    // Event listeners for card selection
+    document.querySelectorAll(".hand-container").forEach((handCardsContainer) => {
       handCardsContainer.addEventListener("click", (event) => this.toggleCardSelection(event));
     });
 
-    // EVENT LISTENERS FOR PASS AND PLAY BUTTONS
-    const passButtons = document.querySelectorAll(".pass");
-    const playButtons = document.querySelectorAll(".play");
-
-    passButtons.forEach((passButton) => {
+    // Event listeners for pass and play buttons.
+    document.querySelectorAll(".pass").forEach((passButton) => {
       passButton.addEventListener("click", (event) => this.checkValidAction("pass", event));
     });
 
-    playButtons.forEach((playButton) => {
+    document.querySelectorAll(".play").forEach((playButton) => {
       playButton.addEventListener("click", (event) => this.checkValidAction("play", event));
     });
   }
