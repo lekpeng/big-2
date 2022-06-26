@@ -16,8 +16,9 @@ const previousTurnContainer = document.querySelector(".previous-turn-container")
 const currentTurnContainer = document.querySelector(".current-turn-container");
 
 class Computer {
-  constructor(id) {
+  constructor(id, currentRound) {
     this.id = id;
+    this.currentRound = currentRound;
     this.cardCodes;
     this.singleCardCodes = [];
     this.doubleCardCodes = [];
@@ -47,45 +48,6 @@ class Computer {
     this.findDoubles();
     this.singleCardCodes = this.cardCodes.map((code) => [code]);
     this.cardCodes = [];
-  }
-
-  pass() {
-    this.passButton.click();
-  }
-
-  determineAction(cardsToBeat = null, cardsToBeatTypeIfFiveCard = null) {
-    if (!cardsToBeat) {
-      // first round first turn
-      const cardCodes = this.find3Diamonds();
-      this.select(cardCodes);
-      this.play();
-    }
-  }
-
-  find3Diamonds() {
-    if (this.singleCardCodes.length && this.singleCardCodes[0].indexOf("3D") > -1) {
-      return this.singleCardCodes.shift();
-    } else if (this.doubleCardCodes.length && this.doubleCardCodes[0].indexOf("3D") > -1) {
-      return this.doubleCardCodes.shift();
-    } else {
-      for (const type in this.fiveCardCodes) {
-        if (this.fiveCardCodes[type].length && this.fiveCardCodes[type][0].indexOf("3D") > -1) {
-          return this.fiveCardCodes[type].shift();
-        }
-      }
-    }
-  }
-
-  select(cardCodes) {
-    console.log("selected card codes", cardCodes);
-    cardCodes.forEach((cardCode) => {
-      const elm = document.querySelector(`[id="${cardCode}"]`);
-      elm.click();
-    });
-  }
-
-  play() {
-    this.playButton.click();
   }
 
   removeCodesFromArr(codesToRemove) {
@@ -176,7 +138,6 @@ class Computer {
       const checkDouble = this.findSameValues(2);
       if (checkDouble.bool) {
         this.fiveCardCodes.fullhouse.push([...checkDouble.found, ...checkTriple.found]);
-        // console.log("this.fiveCardCodes", this.id, this.fiveCardCodes);
       } else {
         // return the triple
         checkTriple.found.forEach((single) => {
@@ -195,8 +156,6 @@ class Computer {
       if (divideBySuits[key].length >= 5) {
         const flushCards = divideBySuits[key].slice(0, 5);
         this.fiveCardCodes.flush.push(flushCards);
-        // console.log("flushCards", this.id, flushCards);
-        // console.log("this.fiveCardCodes.flush", this.id, this.fiveCardCodes.flush);
         this.removeCodesFromArr(flushCards);
         break;
       }
@@ -228,6 +187,103 @@ class Computer {
         break;
       }
     }
+  }
+
+  find3Diamonds() {
+    if (this.singleCardCodes.length && this.singleCardCodes[0].indexOf("3D") > -1) {
+      return this.singleCardCodes.shift();
+    } else if (this.doubleCardCodes.length && this.doubleCardCodes[0].indexOf("3D") > -1) {
+      return this.doubleCardCodes.shift();
+    } else {
+      for (const type in this.fiveCardCodes) {
+        if (this.fiveCardCodes[type].length && this.fiveCardCodes[type][0].indexOf("3D") > -1) {
+          return this.fiveCardCodes[type].shift();
+        }
+      }
+    }
+  }
+
+  pass() {
+    this.passButton.click();
+  }
+
+  play() {
+    this.playButton.click();
+  }
+
+  determineActionFirstTurn() {
+    if (this.currentRound.type === "first") {
+      // first round first turn
+      const cardCodes = this.find3Diamonds();
+      this.select(cardCodes);
+    } else {
+      // throw something randomly (lowest ranked)
+      const allStacks = [this.singleCardCodes, this.doubleCardCodes];
+      console.log("allStacks", allStacks);
+      Object.keys(this.fiveCardCodes).forEach((type) => {
+        allStacks.push(this.fiveCardCodes[type]);
+      });
+      const possibleStacks = allStacks.filter((cardCodes) => cardCodes.length > 0);
+      console.log("possibleStacks", possibleStacks);
+      const cardCodes = possibleStacks[Math.random() * possibleStacks.length][0];
+      this.select(cardCodes);
+    }
+  }
+
+  determineActionGenericTurn() {
+    if (this.currentRound.numCardsAllowed === 5) {
+      return this.determineActionGenericTurn5Cards();
+    }
+    return this.determineActionGenericTurn1Or2Cards();
+  }
+
+  determineActionGenericTurn1Or2Cards() {
+    const numCards = this.currentRound.numCardsAllowed;
+    let typeToCheck;
+
+    if (numCards === 1) {
+      typeToCheck = this.singleCardCodes;
+    } else {
+      typeToCheck = this.doubleCardCodes;
+    }
+    for (const cardCodes of typeToCheck) {
+      const check = new Valid(cardCodes, this.currentRound);
+      if (check.validBeatsOpponent()) {
+        this.select(cardCodes);
+        return;
+      }
+    }
+    this.pass();
+  }
+
+  determineActionGenericTurn5Cards() {
+    const typeToBeat = this.currentRound.fiveCardsRankToBeat;
+    const rankToBeat = BigTwoGame.fiveCardsRank[typeToBeat];
+    let typeToCheck = this.fiveCardCodes[typeToBeat];
+    let rankToCheck = rankToBeat;
+
+    while (rankToCheck < 6) {
+      if (typeToCheck.length) {
+        for (const cardCodes of typeToCheck) {
+          const check = new Valid(cardCodes, this.currentRound);
+          if (check.validBeatsOpponent5Cards()) {
+            this.select(cardCodes);
+            return;
+          }
+        }
+      }
+      rankToCheck += 1;
+      typeToCheck = this.fiveCardCodes[BigTwoGame.fiveCardsRankReversed(rankToCheck)];
+    }
+    this.pass();
+  }
+
+  select(cardCodes) {
+    cardCodes.forEach((cardCode) => {
+      const elm = document.querySelector(`[id="${cardCode}"]`);
+      elm.click();
+    });
+    this.play();
   }
 }
 
@@ -445,6 +501,8 @@ class Valid {
 
     if (fiveCardsRankToBeat === 1 || fiveCardsRankToBeat === 5) {
       // Comparing straights flushes and straights
+      // Will have to change this later to reflect the difference in last two below:
+      // 3,4,5,6,7 < ... < 10,j,q,k,a < 2,3,4,5,6 < A,2,3,4,5
       return this.validBeatsOpponent1Or2Cards(1, this.cards[4], this.currentRound.cardsToBeat[4]);
     } else if (fiveCardsRankToBeat === 2) {
       // Comparing flushes
@@ -531,8 +589,15 @@ class Round {
   }
 
   async setTurnForNextPlayer() {
-    this.turn = players[(players.indexOf(this.turn) + 1) % 4];
-    await this.setInstructionsInDOM(`It is now ${playersToPlayerNamesMapping[this.turn]}'s turn!`);
+    if (this.numPasses < 3) {
+      this.turn = players[(players.indexOf(this.turn) + 1) % 4];
+      await this.setInstructionsInDOM(
+        `It is now ${playersToPlayerNamesMapping[this.turn]}'s turn!`
+      );
+      if (this.turn !== "player") {
+        this.computers[this.turn].determineActionGenericTurn();
+      }
+    }
   }
 
   async startRound() {
@@ -552,10 +617,9 @@ class Round {
       // Remove previous round cards from playing pile in DOM
       playingPileContainer.querySelectorAll(".cards").forEach((card) => card.remove());
     }
-    // Make computer start
+    // Make computer play at start of round (if their turn)
     if (this.turn !== "player") {
-      console.log("this.computers[this.turn]", this.computers[this.turn]);
-      this.computers[this.turn].determineAction();
+      this.computers[this.turn].determineActionFirstTurn();
     }
   }
 
@@ -599,6 +663,8 @@ class BigTwoGame {
   };
 
   static valuesRankReversed = this.reverseKeysAndValuesOfObj(this.valuesRank);
+
+  static fiveCardsRankReversed = this.reverseKeysAndValuesOfObj(this.fiveCardsRank);
 
   static reverseKeysAndValuesOfObj(obj) {
     let newObj = {};
@@ -669,7 +735,6 @@ class BigTwoGame {
   }
 
   toggleCardSelection(event) {
-    console.log("HELLO");
     const card = event.target;
     // Return if not player's turn
     if (card.className !== `${this.currentRound.turn}-holding cards`) {
@@ -684,7 +749,7 @@ class BigTwoGame {
     }
   }
 
-  checkValidAction(action, event) {
+  async checkValidAction(action, event) {
     const selectedCardsCodes = [...document.querySelectorAll("[title='selected']")].map(
       (card) => card.id
     );
@@ -707,12 +772,16 @@ class BigTwoGame {
         );
         return;
       }
-      this.currentRound.setTurnForNextPlayer();
+
       this.currentRound.numPasses += 1;
+      await this.currentRound.setTurnForNextPlayer();
 
       // Start a new round when there are three consecutive passes
       if (this.currentRound.numPasses === 3) {
         this.currentRound = new Round("normal", this.currentRound.turn, this.computers);
+        Object.keys(this.computers).forEach((id) => {
+          this.computers[id].currentRound = this.currentRound;
+        });
         this.currentRound.startRound();
       }
     } else {
@@ -761,26 +830,17 @@ class BigTwoGame {
       playButton.addEventListener("click", (event) => this.checkValidAction("play", event));
     });
 
+    this.currentRound = new Round("first", this.ownerOf3D, this.computers);
+
     players.forEach((id) => {
       if (id.split("-")[0] === "com") {
-        const computer = new Computer(id);
+        const computer = new Computer(id, this.currentRound);
         computer.getCardCodes();
         computer.partition();
-        console.log(id, computer);
-        console.log(
-          computer.singleCardCodes.length +
-            computer.doubleCardCodes.length * 2 +
-            computer.fiveCardCodes.straight.length * 5 +
-            computer.fiveCardCodes.flush.length * 5 +
-            computer.fiveCardCodes.fullhouse.length * 5 +
-            computer.fiveCardCodes.fourofakind.length * 5 +
-            computer.fiveCardCodes.straightflush.length * 5
-        );
         this.computers[id] = computer;
       }
     });
 
-    this.currentRound = new Round("first", this.ownerOf3D, this.computers);
     this.currentRound.startRound();
   }
 }

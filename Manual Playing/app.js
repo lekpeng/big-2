@@ -309,8 +309,11 @@ class Round {
   }
 
   setTurnForNextPlayer() {
-    this.turn = players[(players.indexOf(this.turn) + 1) % 4];
-    this.setInstructionsInDOM(`It is now ${playersToPlayerNamesMapping[this.turn]}'s turn!`);
+    if (this.numPasses < 3) {
+      this.turn = players[(players.indexOf(this.turn) + 1) % 4];
+      console.log(`It is now ${playersToPlayerNamesMapping[this.turn]}'s turn!`);
+      this.setInstructionsInDOM(`It is now ${playersToPlayerNamesMapping[this.turn]}'s turn!`);
+    }
   }
 
   async startRound() {
@@ -473,8 +476,8 @@ class BigTwoGame {
         );
         return;
       }
-      this.currentRound.setTurnForNextPlayer();
       this.currentRound.numPasses += 1;
+      this.currentRound.setTurnForNextPlayer();
 
       // Start a new round when there are three consecutive passes
       if (this.currentRound.numPasses === 3) {
