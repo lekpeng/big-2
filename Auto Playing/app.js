@@ -487,6 +487,11 @@ class Round {
     this.numCardsAllowed;
     this.computers = computers;
   }
+  // WAIT FUNCTION
+
+  sleep(time) {
+    return new Promise((resolve) => setTimeout(resolve, time * 1000));
+  }
 
   addToPlayingPile(cardsArr) {
     // Remove anything that's in prev turn
@@ -525,21 +530,21 @@ class Round {
     return players.find((player) => playerNumCardsThrown[player] === 13);
   }
 
-  setTurnForNextPlayer() {
+  async setTurnForNextPlayer() {
     this.turn = players[(players.indexOf(this.turn) + 1) % 4];
-    this.setInstructionsInDOM(`It is now ${playersToPlayerNamesMapping[this.turn]}'s turn!`);
+    await this.setInstructionsInDOM(`It is now ${playersToPlayerNamesMapping[this.turn]}'s turn!`);
   }
 
   async startRound() {
     // Message
     if (this.type === "first") {
-      this.setInstructionsInDOM(
+      await this.setInstructionsInDOM(
         `${
           playersToPlayerNamesMapping[this.turn]
         } is holding the 3 of Diamonds and\nshould start the game.`
       );
     } else {
-      this.setInstructionsInDOM(
+      await this.setInstructionsInDOM(
         `Everyone passed after ${playersToPlayerNamesMapping[this.turn]}'s previous turn,\nso ${
           playersToPlayerNamesMapping[this.turn]
         } is free to start a new round!`
@@ -554,8 +559,9 @@ class Round {
     }
   }
 
-  setInstructionsInDOM(msg) {
+  async setInstructionsInDOM(msg) {
     instructionsContainer.innerText = msg;
+    await this.sleep(5);
   }
 }
 
