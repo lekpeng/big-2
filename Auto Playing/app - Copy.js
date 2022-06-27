@@ -38,10 +38,6 @@ class Computer {
     this.playButton = document.querySelector(`#${id}`).querySelector(".play");
   }
 
-  sleep(time) {
-    return new Promise((resolve) => setTimeout(resolve, time * 1000));
-  }
-
   getCardCodes() {
     const cardNodes = document.querySelectorAll(`.${this.id}-holding`);
     this.cardCodes = [...cardNodes].map((card) => card.id);
@@ -224,9 +220,7 @@ class Computer {
     this.playButton.click();
   }
 
-  async determineActionFirstTurn() {
-    await this.sleep(5);
-    console.log("determineActionFirstTurn()!!");
+  determineActionFirstTurn() {
     if (this.currentRound.type === "first") {
       // first round first turn
       const cardCodes = this.find3Diamonds();
@@ -247,9 +241,7 @@ class Computer {
     }
   }
 
-  async determineActionGenericTurn() {
-    console.log("determineActionGenericTurn()!!");
-    await this.sleep(5);
+  determineActionGenericTurn() {
     if (this.currentRound.numCardsAllowed === 5) {
       return this.determineActionGenericTurn5Cards();
     }
@@ -609,6 +601,10 @@ class Round {
   }
   // WAIT FUNCTION
 
+  sleep(time) {
+    return new Promise((resolve) => setTimeout(resolve, time * 1000));
+  }
+
   addToPlayingPile(cardsArr) {
     // Remove anything that's in prev turn
     previousTurnContainer.querySelectorAll(".cards").forEach((card) => card.remove());
@@ -637,8 +633,6 @@ class Round {
         `The winner is ${playersToPlayerNamesMapping[this.foundWinningPlayer()]}`
       );
     } else {
-      console.log("set turn due to play");
-      this.changeTurn();
       this.setTurnForNextPlayer();
     }
   }
@@ -648,42 +642,40 @@ class Round {
     return players.find((player) => playerNumCardsThrown[player] === 13);
   }
 
-  changeTurn() {
+  async setTurnForNextPlayer() {
     this.turn = players[(players.indexOf(this.turn) + 1) % 4];
-  }
-
-  setTurnForNextPlayer() {
     if (this.numPasses < 3) {
-      console.log("numPasses1", this.numPasses);
-      this.setInstructionsInDOM(`It is now ${playersToPlayerNamesMapping[this.turn]}'s turn!`);
+      await this.setInstructionsInDOM(
+        `It is now ${playersToPlayerNamesMapping[this.turn]}'s turn!`
+      );
       if (this.turn !== "player") {
-        console.log("numPasses2", this.numPasses);
         this.computers[this.turn].determineActionGenericTurn();
       }
     }
   }
 
-  startRound() {
+  async startRound() {
     // Message
     if (this.type === "first") {
-      this.setInstructionsInDOM(
+      await this.setInstructionsInDOM(
         `${
           playersToPlayerNamesMapping[this.turn]
         } is holding the 3 of Diamonds and\nshould start the game.`
       );
     } else {
-      this.setInstructionsInDOM(
+      await this.setInstructionsInDOM(
         `Everyone passed after ${playersToPlayerNamesMapping[this.turn]}'s previous turn,\nso ${
           playersToPlayerNamesMapping[this.turn]
         } is free to start a new round!`
       );
 
       console.log(
-        `Everyone passed after ${playersToPlayerNamesMapping[this.turn]}'s previous turn,\nso ${
-          playersToPlayerNamesMapping[this.turn]
-        } is free to start a new round!`
+        this.setInstructionsInDOM(
+          `Everyone passed after ${playersToPlayerNamesMapping[this.turn]}'s previous turn,\nso ${
+            playersToPlayerNamesMapping[this.turn]
+          } is free to start a new round!`
+        )
       );
-
       // Remove previous round cards from playing pile in DOM
       playingPileContainer.querySelectorAll(".cards").forEach((card) => card.remove());
     }
@@ -693,8 +685,9 @@ class Round {
     }
   }
 
-  setInstructionsInDOM(msg) {
+  async setInstructionsInDOM(msg) {
     instructionsContainer.innerText = msg;
+    await this.sleep(5);
   }
 }
 
@@ -818,7 +811,7 @@ class BigTwoGame {
     }
   }
 
-  checkValidAction(action, event) {
+  async checkValidAction(action, event) {
     const selectedCardsCodes = [...document.querySelectorAll("[title='selected']")].map(
       (card) => card.id
     );
@@ -843,20 +836,15 @@ class BigTwoGame {
       }
 
       this.currentRound.numPasses += 1;
-      console.log("numPasses after adding", this.currentRound.numPasses);
+      await this.currentRound.setTurnForNextPlayer();
 
-      this.currentRound.changeTurn();
       // Start a new round when there are three consecutive passes
       if (this.currentRound.numPasses === 3) {
         this.currentRound = new Round("normal", this.currentRound.turn, this.computers);
         Object.keys(this.computers).forEach((id) => {
           this.computers[id].currentRound = this.currentRound;
         });
-        console.log("a new round to start now");
         this.currentRound.startRound();
-      } else {
-        console.log("set turn due to pass");
-        this.currentRound.setTurnForNextPlayer();
       }
     } else {
       // Here, action === "play"
