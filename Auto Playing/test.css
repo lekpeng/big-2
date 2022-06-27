@@ -115,10 +115,14 @@ button {
 
 #instructions {
   color: white;
+  height: 80px;
   font-style: italic;
   font-size: 1.5em;
   background-color: grey;
   border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #playing-pile-container {

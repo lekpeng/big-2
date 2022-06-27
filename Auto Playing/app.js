@@ -1,11 +1,13 @@
-// BUGS:
-
-// 1) check 5 cards: why are the coms not playing their 5 card combis?? [fixed]
-// 2) msg for last player that passes is too fast
 // TODO:
-// Make instructional div fixed height.
-// Mobile playing.
-// This should be unique for each player so that multiple people can play at the same time. Try putting in local cache
+// 1) Msg for last player that passes is too fast. Implement wait somewhere.
+// 2) Make cards and buttons of computer players not visible.
+// 3) Let user input their name instead of generic "PLAYER"
+// 4) Mobile playing.
+// 5) deckID should be unique for each player so that multiple people can play at the same time -
+// Use API to retrieve for the first time, then try putting and retrieving from local cache from then on.
+// 6) Clean code.
+// 7) The valid class for computer players maybe an over kill.
+
 const deckID = "tyu78tcx00jy";
 const urlShuffle = `https://deckofcardsapi.com/api/deck/${deckID}/shuffle/`;
 const urlDraw = `https://deckofcardsapi.com/api/deck/${deckID}/draw/?count=52`;
@@ -254,41 +256,6 @@ class Computer {
     return this.determineActionGenericTurn1Or2Cards();
   }
 
-  // cardCodeToRank(code) {
-  //   let value, suit;
-  //   [value, suit] = code.split("");
-  //   return [BigTwoGame.valuesRank[value], BigTwoGame.suitsRank[suit]];
-  // }
-
-  // validBeatsOpponent1Or2Cards(
-  //   num = this.num,
-  //   cards = this.cards,
-  //   cardsToBeat = this.currentRound.cardsToBeat
-  // ) {
-  //   let valueRankToBeat, suitRankToBeat;
-  //   [valueRankToBeat, suitRankToBeat] = this.cardCodeToRank(cardsToBeat[0]);
-
-  //   let valueRankFirst, suitRankFirst;
-  //   [valueRankFirst, suitRankFirst] = this.cardCodeToRank(cards[0]);
-
-  //   if (num === 1) {
-  //     return (
-  //       valueRankFirst > valueRankToBeat ||
-  //       (valueRankFirst === valueRankToBeat && suitRankFirst > suitRankToBeat)
-  //     );
-  //   } else if (num === 2) {
-  //     let valueRankSecond, suitRankSecond;
-  //     [valueRankSecond, suitRankSecond] = this.cardCodeToRank(cards[1]);
-  //     return (
-  //       valueRankFirst > valueRankToBeat ||
-  //       (valueRankFirst === valueRankToBeat && (suitRankFirst === 4 || suitRankSecond === 4))
-  //     );
-  //   }
-  // }
-
-  // CURRENT BUGS
-  // CHECK IF "cards to beat" and "five card type to beat" is present
-  // bug where double 7 can be placed after double Q
   determineActionGenericTurn1Or2Cards() {
     const numCards = this.currentRound.numCardsAllowed;
     let cardsToCheck;
@@ -656,13 +623,13 @@ class Round {
     this.turn = players[(players.indexOf(this.turn) + 1) % 4];
     if (type === "play") {
       this.setInstructionsInDOM(
-        `${playersToPlayerNamesMapping[prevTurn]} has played their turn! It is now ${
+        `${playersToPlayerNamesMapping[prevTurn]} has played their turn!\nIt is now ${
           playersToPlayerNamesMapping[this.turn]
         }'s turn!`
       );
     } else {
       this.setInstructionsInDOM(
-        `${playersToPlayerNamesMapping[prevTurn]} passed! It is now ${
+        `${playersToPlayerNamesMapping[prevTurn]} passed!\nIt is now ${
           playersToPlayerNamesMapping[this.turn]
         }'s turn!`
       );
