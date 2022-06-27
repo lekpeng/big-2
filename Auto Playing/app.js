@@ -231,11 +231,11 @@ class Computer {
   async determineActionFirstTurn() {
     await this.sleep(5);
     if (this.currentRound.type === "first") {
-      // first round first turn
+      // First round
       const cardCodes = this.find3Diamonds();
       this.select(cardCodes);
     } else {
-      // throw something randomly (lowest ranked)
+      // Generic round: Throw something randomly (lowest ranked)
       const allStacks = [this.singleCardCodes, this.doubleCardCodes];
       Object.keys(this.fiveCardCodes).forEach((type) => {
         allStacks.push(this.fiveCardCodes[type]);
@@ -275,7 +275,6 @@ class Computer {
       }
     }
     this.pass();
-    console.log(`${this.id} passed!`);
   }
 
   determineActionGenericTurn5Cards() {
@@ -283,10 +282,6 @@ class Computer {
     const rankToBeat = BigTwoGame.fiveCardsRank[typeToBeat];
     let cardsToCheck = this.fiveCardCodes[typeToBeat];
     let rankToCheck = rankToBeat;
-    console.log(this.id);
-    console.log("typeToBeat", typeToBeat);
-    console.log("rankToBeat", rankToBeat);
-    console.log("cardsToCheck", cardsToCheck);
 
     while (rankToCheck < 6) {
       if (cardsToCheck.length) {
@@ -303,7 +298,6 @@ class Computer {
       cardsToCheck = this.fiveCardCodes[BigTwoGame.fiveCardsRankReversed[rankToCheck]];
     }
     this.pass();
-    console.log(`${this.id} passed (5 card combi)!`);
   }
 
   select(cardCodes) {
@@ -340,7 +334,6 @@ class Valid {
       } else {
         bool = true;
         this.currentRound.cardsToBeatTypeIfFiveCard = validCardsObj.typeIf5Card;
-        console.log("this.currentRound.cardsToBeatTypeIfFiveCard", validCardsObj.typeIf5Card);
       }
     }
     return { validTurn: bool, message: msg };
