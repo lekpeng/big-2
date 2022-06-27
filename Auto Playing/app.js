@@ -1,3 +1,8 @@
+// BUGS:
+// 1) everytime com plays something do the cards get removed from inventory? (they should)
+// 2) how come double 8 can be played after double Q?
+// 3) why are the coms not playing their 5 card combis??
+
 // This should be unique for each player so that multiple people can play at the same time. Try putting in local cache
 const deckID = "tyu78tcx00jy";
 const urlShuffle = `https://deckofcardsapi.com/api/deck/${deckID}/shuffle/`;
@@ -40,19 +45,23 @@ class Computer {
   }
 
   partition() {
-    this.findStraightFlush();
-    this.findFourOfAKind();
-    this.findFullHouse();
-    this.findFlush();
-    this.findStraight();
+    // this.findStraightFlush();
+    // this.findFourOfAKind();
+    // this.findFullHouse();
+    // this.findFlush();
+    // this.findStraight();
     this.findDoubles();
     this.singleCardCodes = this.cardCodes.map((code) => [code]);
     this.cardCodes = [];
   }
 
-  removeCodesFromArr(codesToRemove) {
+  removeCodesFromArrAlt(codesToRemove, arrayToRemoveFrom = this.cardCodes) {
+    arrayToRemoveFrom.splice(arrayToRemoveFrom.indexOf(codesToRemove), 1);
+  }
+
+  removeCodesFromArr(codesToRemove, arrayToRemoveFrom = this.cardCodes) {
     codesToRemove.forEach((code) => {
-      this.cardCodes.splice(this.cardCodes.indexOf(code), 1);
+      arrayToRemoveFrom.splice(arrayToRemoveFrom.indexOf(code), 1);
     });
   }
 
@@ -219,14 +228,16 @@ class Computer {
     } else {
       // throw something randomly (lowest ranked)
       const allStacks = [this.singleCardCodes, this.doubleCardCodes];
-      console.log("allStacks", allStacks);
       Object.keys(this.fiveCardCodes).forEach((type) => {
         allStacks.push(this.fiveCardCodes[type]);
       });
       const possibleStacks = allStacks.filter((cardCodes) => cardCodes.length > 0);
-      console.log("possibleStacks", possibleStacks);
-      const cardCodes = possibleStacks[Math.random() * possibleStacks.length][0];
+      const randomStackChosen = possibleStacks[Math.floor(Math.random() * possibleStacks.length)];
+      const cardCodes = randomStackChosen[0];
       this.select(cardCodes);
+      this.removeCodesFromArrAlt(cardCodes, randomStackChosen);
+      // console.log("randomStackChosen should have below removed", this.id, randomStackChosen);
+      // console.log("cardCodes", this.id, cardCodes);
     }
   }
 
@@ -237,6 +248,42 @@ class Computer {
     return this.determineActionGenericTurn1Or2Cards();
   }
 
+  cardCodeToRank(code) {
+    let value, suit;
+    [value, suit] = code.split("");
+    return [BigTwoGame.valuesRank[value], BigTwoGame.suitsRank[suit]];
+  }
+
+  validBeatsOpponent1Or2Cards(
+    num = this.num,
+    cards = this.cards,
+    cardsToBeat = this.currentRound.cardsToBeat
+  ) {
+    console.log(this.id, cards, cardsToBeat);
+    let valueRankToBeat, suitRankToBeat;
+    [valueRankToBeat, suitRankToBeat] = this.cardCodeToRank(cardsToBeat[0]);
+
+    let valueRankFirst, suitRankFirst;
+    [valueRankFirst, suitRankFirst] = this.cardCodeToRank(cards[0]);
+
+    if (num === 1) {
+      return (
+        valueRankFirst > valueRankToBeat ||
+        (valueRankFirst === valueRankToBeat && suitRankFirst > suitRankToBeat)
+      );
+    } else if (num === 2) {
+      let valueRankSecond, suitRankSecond;
+      [valueRankSecond, suitRankSecond] = this.cardCodeToRank(cards[1]);
+      return (
+        valueRankFirst > valueRankToBeat ||
+        (valueRankFirst === valueRankToBeat && (suitRankFirst === 4 || suitRankSecond === 4))
+      );
+    }
+  }
+
+  // CURRENT BUGS
+  // CHECK IF "cards to beat" and "five card type to beat" is present
+  // bug where double 7 can be placed after double Q
   determineActionGenericTurn1Or2Cards() {
     const numCards = this.currentRound.numCardsAllowed;
     let typeToCheck;
@@ -247,13 +294,17 @@ class Computer {
       typeToCheck = this.doubleCardCodes;
     }
     for (const cardCodes of typeToCheck) {
-      const check = new Valid(cardCodes, this.currentRound);
-      if (check.validBeatsOpponent()) {
+      if (this.validBeatsOpponent1Or2Cards(numCards, cardCodes, this.currentRound.cardsToBeat)) {
+        console.log(this.id, "supposedly valid", cardCodes);
         this.select(cardCodes);
+        this.removeCodesFromArrAlt(cardCodes, typeToCheck);
+        // console.log("single/double stack should have below removed", this.id, typeToCheck);
+        // console.log("cardCodes", this.id, cardCodes);
         return;
       }
     }
     this.pass();
+    console.log(`${this.id} passed!`);
   }
 
   determineActionGenericTurn5Cards() {
@@ -267,7 +318,9 @@ class Computer {
         for (const cardCodes of typeToCheck) {
           const check = new Valid(cardCodes, this.currentRound);
           if (check.validBeatsOpponent5Cards()) {
+            console.log("determineActionGenericTurn5Cards", "supposedly valid", cardCodes);
             this.select(cardCodes);
+            this.removeCodesFromArrAlt(cardCodes, typeToCheck);
             return;
           }
         }
@@ -276,6 +329,7 @@ class Computer {
       typeToCheck = this.fiveCardCodes[BigTwoGame.fiveCardsRankReversed(rankToCheck)];
     }
     this.pass();
+    console.log(`${this.id} passed (5 card combi)!`);
   }
 
   select(cardCodes) {
@@ -589,8 +643,8 @@ class Round {
   }
 
   async setTurnForNextPlayer() {
+    this.turn = players[(players.indexOf(this.turn) + 1) % 4];
     if (this.numPasses < 3) {
-      this.turn = players[(players.indexOf(this.turn) + 1) % 4];
       await this.setInstructionsInDOM(
         `It is now ${playersToPlayerNamesMapping[this.turn]}'s turn!`
       );
@@ -613,6 +667,14 @@ class Round {
         `Everyone passed after ${playersToPlayerNamesMapping[this.turn]}'s previous turn,\nso ${
           playersToPlayerNamesMapping[this.turn]
         } is free to start a new round!`
+      );
+
+      console.log(
+        this.setInstructionsInDOM(
+          `Everyone passed after ${playersToPlayerNamesMapping[this.turn]}'s previous turn,\nso ${
+            playersToPlayerNamesMapping[this.turn]
+          } is free to start a new round!`
+        )
       );
       // Remove previous round cards from playing pile in DOM
       playingPileContainer.querySelectorAll(".cards").forEach((card) => card.remove());

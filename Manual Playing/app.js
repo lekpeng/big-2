@@ -196,7 +196,10 @@ class Valid {
     } else if (num === 2) {
       let valueRankSecond, suitRankSecond;
       [valueRankSecond, suitRankSecond] = this.cardCodeToRank(cards[1]);
-      return valueRankFirst > valueRankToBeat || suitRankFirst === 4 || suitRankSecond === 4;
+      return (
+        valueRankFirst > valueRankToBeat ||
+        (valueRankFirst === valueRankToBeat && (suitRankFirst === 4 || suitRankSecond === 4))
+      );
     }
   }
 
@@ -309,14 +312,14 @@ class Round {
   }
 
   setTurnForNextPlayer() {
+    this.turn = players[(players.indexOf(this.turn) + 1) % 4];
     if (this.numPasses < 3) {
-      this.turn = players[(players.indexOf(this.turn) + 1) % 4];
       console.log(`It is now ${playersToPlayerNamesMapping[this.turn]}'s turn!`);
       this.setInstructionsInDOM(`It is now ${playersToPlayerNamesMapping[this.turn]}'s turn!`);
     }
   }
 
-  async startRound() {
+  startRound() {
     if (this.type === "first") {
       this.setInstructionsInDOM(
         `${
