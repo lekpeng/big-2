@@ -1,8 +1,10 @@
 // BUGS:
-// 1) everytime com plays something do the cards get removed from inventory? (they should)
-// 2) how come double 8 can be played after double Q?
-// 3) why are the coms not playing their 5 card combis??
 
+// 1) check 5 cards: why are the coms not playing their 5 card combis?? [fixed]
+// 2) msg for last player that passes is too fast
+// TODO:
+// Make instructional div fixed height.
+// Mobile playing.
 // This should be unique for each player so that multiple people can play at the same time. Try putting in local cache
 const deckID = "tyu78tcx00jy";
 const urlShuffle = `https://deckofcardsapi.com/api/deck/${deckID}/shuffle/`;
@@ -49,11 +51,11 @@ class Computer {
   }
 
   partition() {
-    // this.findStraightFlush();
-    // this.findFourOfAKind();
-    // this.findFullHouse();
-    // this.findFlush();
-    // this.findStraight();
+    this.findStraightFlush();
+    this.findFourOfAKind();
+    this.findFullHouse();
+    this.findFlush();
+    this.findStraight();
     this.findDoubles();
     this.singleCardCodes = this.cardCodes.map((code) => [code]);
     this.cardCodes = [];
@@ -226,7 +228,6 @@ class Computer {
 
   async determineActionFirstTurn() {
     await this.sleep(5);
-    console.log("determineActionFirstTurn()!!");
     if (this.currentRound.type === "first") {
       // first round first turn
       const cardCodes = this.find3Diamonds();
@@ -242,13 +243,10 @@ class Computer {
       const cardCodes = randomStackChosen[0];
       this.select(cardCodes);
       this.removeCodesFromArrAlt(cardCodes, randomStackChosen);
-      // console.log("randomStackChosen should have below removed", this.id, randomStackChosen);
-      // console.log("cardCodes", this.id, cardCodes);
     }
   }
 
   async determineActionGenericTurn() {
-    console.log("determineActionGenericTurn()!!");
     await this.sleep(5);
     if (this.currentRound.numCardsAllowed === 5) {
       return this.determineActionGenericTurn5Cards();
@@ -256,58 +254,56 @@ class Computer {
     return this.determineActionGenericTurn1Or2Cards();
   }
 
-  cardCodeToRank(code) {
-    let value, suit;
-    [value, suit] = code.split("");
-    return [BigTwoGame.valuesRank[value], BigTwoGame.suitsRank[suit]];
-  }
+  // cardCodeToRank(code) {
+  //   let value, suit;
+  //   [value, suit] = code.split("");
+  //   return [BigTwoGame.valuesRank[value], BigTwoGame.suitsRank[suit]];
+  // }
 
-  validBeatsOpponent1Or2Cards(
-    num = this.num,
-    cards = this.cards,
-    cardsToBeat = this.currentRound.cardsToBeat
-  ) {
-    console.log(this.id, cards, cardsToBeat);
-    let valueRankToBeat, suitRankToBeat;
-    [valueRankToBeat, suitRankToBeat] = this.cardCodeToRank(cardsToBeat[0]);
+  // validBeatsOpponent1Or2Cards(
+  //   num = this.num,
+  //   cards = this.cards,
+  //   cardsToBeat = this.currentRound.cardsToBeat
+  // ) {
+  //   let valueRankToBeat, suitRankToBeat;
+  //   [valueRankToBeat, suitRankToBeat] = this.cardCodeToRank(cardsToBeat[0]);
 
-    let valueRankFirst, suitRankFirst;
-    [valueRankFirst, suitRankFirst] = this.cardCodeToRank(cards[0]);
+  //   let valueRankFirst, suitRankFirst;
+  //   [valueRankFirst, suitRankFirst] = this.cardCodeToRank(cards[0]);
 
-    if (num === 1) {
-      return (
-        valueRankFirst > valueRankToBeat ||
-        (valueRankFirst === valueRankToBeat && suitRankFirst > suitRankToBeat)
-      );
-    } else if (num === 2) {
-      let valueRankSecond, suitRankSecond;
-      [valueRankSecond, suitRankSecond] = this.cardCodeToRank(cards[1]);
-      return (
-        valueRankFirst > valueRankToBeat ||
-        (valueRankFirst === valueRankToBeat && (suitRankFirst === 4 || suitRankSecond === 4))
-      );
-    }
-  }
+  //   if (num === 1) {
+  //     return (
+  //       valueRankFirst > valueRankToBeat ||
+  //       (valueRankFirst === valueRankToBeat && suitRankFirst > suitRankToBeat)
+  //     );
+  //   } else if (num === 2) {
+  //     let valueRankSecond, suitRankSecond;
+  //     [valueRankSecond, suitRankSecond] = this.cardCodeToRank(cards[1]);
+  //     return (
+  //       valueRankFirst > valueRankToBeat ||
+  //       (valueRankFirst === valueRankToBeat && (suitRankFirst === 4 || suitRankSecond === 4))
+  //     );
+  //   }
+  // }
 
   // CURRENT BUGS
   // CHECK IF "cards to beat" and "five card type to beat" is present
   // bug where double 7 can be placed after double Q
   determineActionGenericTurn1Or2Cards() {
     const numCards = this.currentRound.numCardsAllowed;
-    let typeToCheck;
+    let cardsToCheck;
 
     if (numCards === 1) {
-      typeToCheck = this.singleCardCodes;
+      cardsToCheck = this.singleCardCodes;
     } else {
-      typeToCheck = this.doubleCardCodes;
+      cardsToCheck = this.doubleCardCodes;
     }
-    for (const cardCodes of typeToCheck) {
-      if (this.validBeatsOpponent1Or2Cards(numCards, cardCodes, this.currentRound.cardsToBeat)) {
-        console.log(this.id, "supposedly valid", cardCodes);
+    for (const cardCodes of cardsToCheck) {
+      const check = new Valid(cardCodes, this.currentRound);
+      if (check.validBeatsOpponent1Or2Cards()) {
+        // if (this.validBeatsOpponent1Or2Cards(numCards, cardCodes, this.currentRound.cardsToBeat)) {
         this.select(cardCodes);
-        this.removeCodesFromArrAlt(cardCodes, typeToCheck);
-        // console.log("single/double stack should have below removed", this.id, typeToCheck);
-        // console.log("cardCodes", this.id, cardCodes);
+        this.removeCodesFromArrAlt(cardCodes, cardsToCheck);
         return;
       }
     }
@@ -316,25 +312,28 @@ class Computer {
   }
 
   determineActionGenericTurn5Cards() {
-    const typeToBeat = this.currentRound.fiveCardsRankToBeat;
+    const typeToBeat = this.currentRound.cardsToBeatTypeIfFiveCard;
     const rankToBeat = BigTwoGame.fiveCardsRank[typeToBeat];
-    let typeToCheck = this.fiveCardCodes[typeToBeat];
+    let cardsToCheck = this.fiveCardCodes[typeToBeat];
     let rankToCheck = rankToBeat;
+    console.log(this.id);
+    console.log("typeToBeat", typeToBeat);
+    console.log("rankToBeat", rankToBeat);
+    console.log("cardsToCheck", cardsToCheck);
 
     while (rankToCheck < 6) {
-      if (typeToCheck.length) {
-        for (const cardCodes of typeToCheck) {
+      if (cardsToCheck.length) {
+        for (const cardCodes of cardsToCheck) {
           const check = new Valid(cardCodes, this.currentRound);
-          if (check.validBeatsOpponent5Cards()) {
-            console.log("determineActionGenericTurn5Cards", "supposedly valid", cardCodes);
+          if (check.validBeatsOpponent5Cards(rankToCheck)) {
             this.select(cardCodes);
-            this.removeCodesFromArrAlt(cardCodes, typeToCheck);
+            this.removeCodesFromArrAlt(cardCodes, cardsToCheck);
             return;
           }
         }
       }
       rankToCheck += 1;
-      typeToCheck = this.fiveCardCodes[BigTwoGame.fiveCardsRankReversed(rankToCheck)];
+      cardsToCheck = this.fiveCardCodes[BigTwoGame.fiveCardsRankReversed[rankToCheck]];
     }
     this.pass();
     console.log(`${this.id} passed (5 card combi)!`);
@@ -374,6 +373,7 @@ class Valid {
       } else {
         bool = true;
         this.currentRound.cardsToBeatTypeIfFiveCard = validCardsObj.typeIf5Card;
+        console.log("this.currentRound.cardsToBeatTypeIfFiveCard", validCardsObj.typeIf5Card);
       }
     }
     return { validTurn: bool, message: msg };
@@ -530,7 +530,10 @@ class Valid {
     } else if (num === 2) {
       let valueRankSecond, suitRankSecond;
       [valueRankSecond, suitRankSecond] = this.cardCodeToRank(cards[1]);
-      return valueRankFirst > valueRankToBeat || suitRankFirst === 4 || suitRankSecond === 4;
+      return (
+        valueRankFirst > valueRankToBeat ||
+        (valueRankFirst === valueRankToBeat && (suitRankFirst === 4 || suitRankSecond === 4))
+      );
     }
   }
 
@@ -548,10 +551,11 @@ class Valid {
     return sortedCardsArr[3];
   }
 
-  validBeatsOpponent5Cards() {
+  validBeatsOpponent5Cards(
+    fiveCardsRankCurrPlayer = BigTwoGame.fiveCardsRank[this.cardsTypeIfFiveCard]
+  ) {
     const fiveCardsRankToBeat =
       BigTwoGame.fiveCardsRank[this.currentRound.cardsToBeatTypeIfFiveCard];
-    const fiveCardsRankCurrPlayer = BigTwoGame.fiveCardsRank[this.cardsTypeIfFiveCard];
 
     if (fiveCardsRankCurrPlayer !== fiveCardsRankToBeat) {
       return fiveCardsRankCurrPlayer > fiveCardsRankToBeat;
@@ -637,9 +641,8 @@ class Round {
         `The winner is ${playersToPlayerNamesMapping[this.foundWinningPlayer()]}`
       );
     } else {
-      console.log("set turn due to play");
-      this.changeTurn();
-      this.setTurnForNextPlayer();
+      this.changeTurn("play");
+      this.makeComputerPlay();
     }
   }
 
@@ -648,19 +651,30 @@ class Round {
     return players.find((player) => playerNumCardsThrown[player] === 13);
   }
 
-  changeTurn() {
+  changeTurn(type) {
+    const prevTurn = this.turn;
     this.turn = players[(players.indexOf(this.turn) + 1) % 4];
+    if (type === "play") {
+      this.setInstructionsInDOM(
+        `${playersToPlayerNamesMapping[prevTurn]} has played their turn! It is now ${
+          playersToPlayerNamesMapping[this.turn]
+        }'s turn!`
+      );
+    } else {
+      this.setInstructionsInDOM(
+        `${playersToPlayerNamesMapping[prevTurn]} passed! It is now ${
+          playersToPlayerNamesMapping[this.turn]
+        }'s turn!`
+      );
+    }
   }
 
-  setTurnForNextPlayer() {
-    if (this.numPasses < 3) {
-      console.log("numPasses1", this.numPasses);
-      this.setInstructionsInDOM(`It is now ${playersToPlayerNamesMapping[this.turn]}'s turn!`);
-      if (this.turn !== "player") {
-        console.log("numPasses2", this.numPasses);
-        this.computers[this.turn].determineActionGenericTurn();
-      }
+  makeComputerPlay() {
+    // if (this.numPasses < 3) {
+    if (this.turn !== "player") {
+      this.computers[this.turn].determineActionGenericTurn();
     }
+    // }
   }
 
   startRound() {
@@ -673,12 +687,6 @@ class Round {
       );
     } else {
       this.setInstructionsInDOM(
-        `Everyone passed after ${playersToPlayerNamesMapping[this.turn]}'s previous turn,\nso ${
-          playersToPlayerNamesMapping[this.turn]
-        } is free to start a new round!`
-      );
-
-      console.log(
         `Everyone passed after ${playersToPlayerNamesMapping[this.turn]}'s previous turn,\nso ${
           playersToPlayerNamesMapping[this.turn]
         } is free to start a new round!`
@@ -843,20 +851,18 @@ class BigTwoGame {
       }
 
       this.currentRound.numPasses += 1;
-      console.log("numPasses after adding", this.currentRound.numPasses);
+      this.currentRound.changeTurn("pass");
 
-      this.currentRound.changeTurn();
       // Start a new round when there are three consecutive passes
       if (this.currentRound.numPasses === 3) {
         this.currentRound = new Round("normal", this.currentRound.turn, this.computers);
         Object.keys(this.computers).forEach((id) => {
           this.computers[id].currentRound = this.currentRound;
         });
-        console.log("a new round to start now");
+
         this.currentRound.startRound();
       } else {
-        console.log("set turn due to pass");
-        this.currentRound.setTurnForNextPlayer();
+        this.currentRound.makeComputerPlay();
       }
     } else {
       // Here, action === "play"
