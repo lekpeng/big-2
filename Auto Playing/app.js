@@ -1,12 +1,14 @@
 // TODO:
 // 1) Msg for last player that passes is too fast. Implement wait somewhere.
-// 2) Make cards and buttons of computer players not visible.
+// 2) [DONE] Make cards and buttons of computer players not visible.
 // 3) Let user input their name instead of generic "PLAYER"
 // 4) Mobile playing.
 // 5) deckID should be unique for each player so that multiple people can play at the same time -
 // Use API to retrieve for the first time, then try putting and retrieving from local cache from then on.
 // 6) Clean code.
 // 7) The valid class for computer players maybe an over kill.
+// 8) Restart button
+// 9) Change the CSS of the playing pile so that they stack and it's clearer which is the "later" card
 
 const deckID = "tyu78tcx00jy";
 const urlShuffle = `https://deckofcardsapi.com/api/deck/${deckID}/shuffle/`;

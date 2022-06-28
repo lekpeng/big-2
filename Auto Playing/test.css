@@ -22,6 +22,7 @@ button {
 .cards {
   width: 70px;
   padding: 0 3px;
+  /* margin: 0 3px; */
   cursor: pointer;
 }
 
@@ -88,6 +89,18 @@ button {
   /* so that we can order cards */
   display: flex;
   justify-content: center;
+}
+
+#com-1 .cards,
+#com-2 .cards,
+#com-3 .cards {
+  filter: brightness(0%);
+}
+
+#com-1 button,
+#com-2 button,
+#com-3 button {
+  visibility: hidden;
 }
 
 .sort-buttons {
