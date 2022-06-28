@@ -1,7 +1,7 @@
 :root {
-  --w: 70em;
+  --w: 100vh;
   --h: var(--w);
-  --ph: 11.5em;
+  --ph: 20vh;
   --p1: 180deg;
   --p2: 270deg;
   --p3: 0deg;
@@ -20,7 +20,7 @@ button {
 
 /* CARDS */
 .cards {
-  width: 70px;
+  width: 6vh;
   padding: 0 3px;
   /* margin: 0 3px; */
   cursor: pointer;
@@ -128,9 +128,9 @@ button {
 
 #instructions {
   color: white;
-  height: 80px;
+  height: 10vh;
   font-style: italic;
-  font-size: 1.5em;
+  font-size: 1em;
   background-color: grey;
   border-radius: 15px;
   display: flex;
@@ -145,7 +145,7 @@ button {
 #playing-pile-container > * {
   margin-top: 2em;
   background-color: maroon;
-  height: 150px;
+  height: 15vh;
   border-radius: 10px;
 }
 
