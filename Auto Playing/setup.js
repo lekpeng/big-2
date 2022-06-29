@@ -22,7 +22,6 @@ function childrenAppender(parentElm, childrenElms) {
 const players = ["com-2", "com-3", "player", "com-1"];
 const playersDiv = document.querySelector(".players");
 
-// can ask user input for the name of player id "player"
 let playersToPlayerNamesMapping = {};
 players.forEach((player) => {
   playersToPlayerNamesMapping[player] = player.toUpperCase().replace("-", " ");

@@ -3,17 +3,19 @@
 // 2) [DONE] Make cards and buttons of computer players not visible.
 // 3) [DONE] Let user input their name instead of generic "PLAYER" (modal pop up) and local storage
 // 4) [NO TIME] Mobile playing.
-// 5) **deckID should be unique for each player so that multiple people can play at the same time -
+// 5) [DONE] deckID should be unique for each player so that multiple people can play at the same time -
 //    Use API to retrieve for the first time, then try putting and retrieving from local cache from then on.
 // 6) Clean code.
 // 7) The valid class for computer players maybe an over kill.
 // 8) **Restart button
 // 9) [DONE] Change the CSS of the playing pile so that they stack and it's clearer which is the "later" card
 // 10) [DONE] Add about page to introduce games and explain rules
+// 11) Reflect the cards played by players.
 
-const deckID = "tyu78tcx00jy";
-const urlShuffle = `https://deckofcardsapi.com/api/deck/${deckID}/shuffle/`;
-const urlDraw = `https://deckofcardsapi.com/api/deck/${deckID}/draw/?count=52`;
+const urlGetDeckID = "https://deckofcardsapi.com/api/deck/new/shuffle/";
+let deckID = "";
+let urlShuffle = "";
+let urlDraw = "";
 
 // Will track terminating condition
 let playerNumCardsThrown = {};
@@ -724,6 +726,17 @@ class BigTwoGame {
     this.computers = {};
     this.orderMapping = {};
   }
+  async getDeckID() {
+    if (Object.keys(localStorage).includes("deck-id")) {
+      deckID = localStorage["deck-id"];
+    } else {
+      const data = await fetchDataAsync(urlGetDeckID);
+      deckID = data.deck_id;
+      localStorage.setItem("deck-id", deckID);
+    }
+    urlShuffle = `https://deckofcardsapi.com/api/deck/${deckID}/shuffle/`;
+    urlDraw = `https://deckofcardsapi.com/api/deck/${deckID}/draw/?count=52`;
+  }
 
   async distributeCards() {
     // Shuffle and draw all cards
@@ -853,6 +866,7 @@ class BigTwoGame {
 
   async startGame() {
     await setUpHTML();
+    await this.getDeckID();
     await this.distributeCards();
 
     // Event listeners for sorting buttons
