@@ -28,6 +28,10 @@ players.forEach((player) => {
   playersToPlayerNamesMapping[player] = player.toUpperCase().replace("-", " ");
 });
 
+if (Object.keys(localStorage).includes("player-name")) {
+  playersToPlayerNamesMapping["player"] = localStorage["player-name"];
+}
+
 function setUpHTML() {
   players.forEach((player) => {
     const playPassButtonsDiv = elementCreator("div", {

@@ -140,28 +140,35 @@
         <button type="button" class="btn btn-primary">Restart</button>
       </div>
 
-      <div class="game-play">
-        <div class="board">
-          <div class="players"></div>
-          <!-- CENTER BOARD -->
-          <div id="center-board" class="text-center">
-            <!-- INSTRUCTIONS -->
-            <div id="instructions-and-playing-pile">
-              <div id="instructions">
-                Welcome to Big 2! Please wait while we distribute the cards.
-              </div>
-              <div id="playing-pile-container">
-                <div class="previous-turn">
-                  <!-- <p>Previous turn</p> -->
-                  <div class="previous-turn-container"></div>
-                </div>
-                <div class="current-turn">
-                  <!-- <p>Current turn</p> -->
-                  <div class="current-turn-container"></div>
-                </div>
-              </div>
+      <div class="introduction">
+        <h1>Welcome to Big Two!</h1>
+        <h6>
+          If this is the first time you're hearing of "Big Two", click "About" to gain a better
+          understanding of the gameplay and rules.<br />
+          Else, feel free to enter your name below and start playing! <br /><br />P.S. We remember
+          your name if you've entered it before, so you don't have to do it a second time (unless
+          you want to go by a different name, of course!)
+        </h6>
+        <div class="player-name-form-wrapper text-center">
+          <form class="row g-3" id="player-name-form">
+            <label for="player-input-name" class="form-label">I would like to go by</label>
+            <div class="col-auto">
+              <input
+                type="text"
+                class="form-control form-control-lg"
+                id="player-input-name"
+                autocomplete="off"
+              />
             </div>
-          </div>
+            <div class="col-auto">
+              <button id="submit-button" type="submit" class="btn btn-primary btn-lg">
+                Submit
+              </button>
+            </div>
+          </form>
+          <button id="start-game-button" type="button" class="btn btn-success btn-lg">
+            <a href="./test.html">Start game!</a>
+          </button>
         </div>
       </div>
     </div>
@@ -170,7 +177,6 @@
       integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
       crossorigin="anonymous"
     ></script>
-    <script src="setup.js"></script>
-    <script src="app.js"></script>
+    <script src="index.js"></script>
   </body>
 </html>

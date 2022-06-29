@@ -66,9 +66,18 @@ button {
 }
 
 /* BOARD */
-.game-play {
+.game-play,
+.introduction {
   margin: auto;
   width: calc(var(--w) + calc(2 * var(--ph)));
+}
+
+.introduction {
+  border: black solid;
+  height: 100vh;
+  padding-top: 2em;
+  padding-left: 10em;
+  padding-right: 10em;
 }
 
 .board {
@@ -228,4 +237,34 @@ button {
 .modal p,
 .modal li {
   font-size: 0.8em;
+}
+
+.introduction h1 {
+  text-align: center;
+}
+
+.introduction h6 {
+  font-style: italic;
+  margin-top: 1.5em;
+  margin-bottom: 5em;
+}
+
+.player-name-form-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#start-game-button {
+  margin-top: 5em;
+}
+#about-button {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+a:link,
+a:visited {
+  color: white;
+  text-decoration: none;
 }

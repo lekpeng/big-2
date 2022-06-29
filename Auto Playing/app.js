@@ -1,9 +1,9 @@
 // TODO:
 // 1) Use the alerts thing (modal) from bootstrap when player makes invalid move instead of using the instructions div
 // 2) [DONE] Make cards and buttons of computer players not visible.
-// 3) *Let user input their name instead of generic "PLAYER" (modal pop up) and local storage
+// 3) [DONE] Let user input their name instead of generic "PLAYER" (modal pop up) and local storage
 // 4) [NO TIME] Mobile playing.
-// 5) *deckID should be unique for each player so that multiple people can play at the same time -
+// 5) **deckID should be unique for each player so that multiple people can play at the same time -
 //    Use API to retrieve for the first time, then try putting and retrieving from local cache from then on.
 // 6) Clean code.
 // 7) The valid class for computer players maybe an over kill.
