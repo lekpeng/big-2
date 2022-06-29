@@ -1,7 +1,7 @@
 :root {
-  --w: 100vh;
+  --w: 120vh;
   --h: var(--w);
-  --ph: 20vh;
+  --ph: 25vh;
   --p1: 180deg;
   --p2: 270deg;
   --p3: 0deg;
@@ -9,22 +9,53 @@
 }
 
 body {
-  margin: auto;
-  width: var(--w);
+  /* margin: auto;
+  width: calc(var(--w) + calc(2 * var(--ph))); */
   font-family: "Arial", Helvetica, sans-serif;
 }
 
+.main {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.menu {
+  flex-basis: 5%;
+}
+
+.menu button {
+  display: block;
+}
+
+/* p {
+  margin-bottom: 0.3em;
+  font-size: 0.8em;
+} */
+
 button {
   margin-left: 0.5em;
+  font-size: 0.8em;
 }
 
 /* CARDS */
 .cards {
-  width: 6vh;
-  padding: 0 3px;
+  width: 9vh;
+  padding: 0 2px;
   /* margin: 0 3px; */
   cursor: pointer;
 }
+
+#com-1 .cards,
+#com-2 .cards,
+#com-3 .cards {
+  width: 6vh;
+}
+
+/* #player .cards:hover,
+#playing-pile-container .cards:hover {
+  transform: scale(1.5);
+} */
 
 .cards[title="selected"] {
   box-shadow: 0 0 10px 5px black;
@@ -35,10 +66,15 @@ button {
 }
 
 /* BOARD */
+.game-play {
+  margin: auto;
+  width: calc(var(--w) + calc(2 * var(--ph)));
+}
+
 .board {
   position: relative;
-  width: var(--w);
-  height: var(--h);
+  width: calc(var(--w) + calc(2 * var(--ph)));
+  height: calc(var(--h) - var(--ph));
 }
 
 /* PLAYER  */
@@ -50,28 +86,34 @@ button {
   padding: 0.5em;
 }
 
+.player-name {
+  font-size: 1em;
+}
+
 .player:nth-child(1) {
-  --xp: calc(var(--ph) - var(--w));
+  --xp: calc(0em - var(--w));
   transform: rotate(var(--p1)) translate(var(--xp), 0);
+  width: var(--w);
   background-color: yellow;
 }
 
 .player:nth-child(2) {
-  --xp: calc(calc(2 * var(--ph)) - var(--w));
-  --yp: calc(var(--w) - var(--ph));
+  --xp: calc(calc(3 * var(--ph)) - var(--w));
+  --yp: calc(var(--w) + calc(1 * var(--ph)));
   transform: rotate(var(--p2)) translate(var(--xp), var(--yp));
   background-color: skyblue;
 }
 
 .player:nth-child(3) {
-  --yp: calc(var(--w) - calc(3 * var(--ph)));
-  transform: rotate(var(--p3)) translate(0, var(--yp));
+  --yp: calc(var(--w) - calc(4 * var(--ph)));
+  transform: rotate(var(--p3)) translate(var(--ph), var(--yp));
+  width: var(--w);
   background-color: rgb(95, 255, 95);
 }
 
 .player:nth-child(4) {
   --xp: calc(0em - calc(3 * var(--ph)));
-  transform: rotate(var(--p4)) translate(var(--xp), 0em);
+  transform: rotate(var(--p4)) translate(var(--xp), 0);
   background-color: pink;
 }
 
@@ -109,12 +151,13 @@ button {
 
 /* CENTER BOARD */
 #center-board {
-  --d: calc(var(--w) - calc(2 * var(--ph)));
+  --dw: var(--w);
+  --dh: calc(var(--w) - calc(3 * var(--ph)));
   position: absolute;
   top: var(--ph);
   left: var(--ph);
-  width: var(--d);
-  height: var(--d);
+  width: var(--dw);
+  height: var(--dh);
   box-sizing: border-box;
   display: flex;
   justify-content: center;
@@ -132,7 +175,7 @@ button {
   font-style: italic;
   font-size: 1em;
   background-color: grey;
-  border-radius: 15px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -143,14 +186,46 @@ button {
 }
 
 #playing-pile-container > * {
-  margin-top: 2em;
+  margin-top: 1em;
   background-color: maroon;
-  height: 15vh;
+  height: 12vh;
   border-radius: 10px;
 }
 
 .previous-turn,
 .current-turn {
-  color: white;
-  text-decoration: underline;
+  display: flex;
+  justify-content: center;
+}
+
+.previous-turn {
+  align-items: flex-end;
+}
+
+.current-turn {
+  position: relative;
+  top: -10vh;
+  align-items: flex-start;
+}
+
+.modal-header {
+  margin-top: 2em;
+  margin-left: 2em;
+}
+
+.modal-body {
+  margin: 0 2em;
+}
+
+.modal h5 {
+  font-weight: bold;
+}
+
+.modal h6 {
+  font-weight: bold;
+}
+
+.modal p,
+.modal li {
+  font-size: 0.8em;
 }

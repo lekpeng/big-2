@@ -28,66 +28,68 @@ players.forEach((player) => {
   playersToPlayerNamesMapping[player] = player.toUpperCase().replace("-", " ");
 });
 
-players.forEach((player) => {
-  const playPassButtonsDiv = elementCreator("div", {
-    className: "play-pass-buttons",
+function setUpHTML() {
+  players.forEach((player) => {
+    const playPassButtonsDiv = elementCreator("div", {
+      className: "play-pass-buttons",
+    });
+
+    childrenAppender(playPassButtonsDiv, [
+      elementCreator("button", {
+        className: "play",
+        type: "button",
+        innerText: "Play",
+      }),
+      elementCreator("button", {
+        className: "pass",
+        type: "button",
+        innerText: "Pass",
+      }),
+    ]);
+
+    const playerNameAndPassPlayButtons = elementCreator("div", {
+      className: "player-name-and-pass-play-buttons",
+    });
+
+    childrenAppender(playerNameAndPassPlayButtons, [
+      elementCreator("h5", {
+        className: "player-name",
+        innerText: playersToPlayerNamesMapping[player],
+      }),
+      playPassButtonsDiv,
+    ]);
+
+    const sortButtonsDiv = elementCreator("div", {
+      className: "sort-buttons",
+    });
+
+    childrenAppender(sortButtonsDiv, [
+      elementCreator("button", {
+        className: "sort-number",
+        type: "button",
+        innerText: "Sort By Value",
+      }),
+      elementCreator("button", {
+        className: "sort-suit",
+        type: "button",
+        innerText: "Sort By Suit",
+      }),
+    ]);
+
+    const mainPlayerDiv = elementCreator("div", {
+      id: `${player}`,
+      className: "player",
+    });
+
+    childrenAppender(mainPlayerDiv, [
+      playerNameAndPassPlayButtons,
+      elementCreator("div", {
+        id: `${player}-hand-container`,
+        className: "hand-container",
+      }),
+      sortButtonsDiv,
+    ]);
+
+    playersDiv.appendChild(mainPlayerDiv);
   });
-
-  childrenAppender(playPassButtonsDiv, [
-    elementCreator("button", {
-      className: "play",
-      type: "button",
-      innerText: "Play",
-    }),
-    elementCreator("button", {
-      className: "pass",
-      type: "button",
-      innerText: "Pass",
-    }),
-  ]);
-
-  const playerNameAndPassPlayButtons = elementCreator("div", {
-    className: "player-name-and-pass-play-buttons",
-  });
-
-  childrenAppender(playerNameAndPassPlayButtons, [
-    elementCreator("h5", {
-      className: "player-name",
-      innerText: playersToPlayerNamesMapping[player],
-    }),
-    playPassButtonsDiv,
-  ]);
-
-  const sortButtonsDiv = elementCreator("div", {
-    className: "sort-buttons",
-  });
-
-  childrenAppender(sortButtonsDiv, [
-    elementCreator("button", {
-      className: "sort-number",
-      type: "button",
-      innerText: "Sort By Value",
-    }),
-    elementCreator("button", {
-      className: "sort-suit",
-      type: "button",
-      innerText: "Sort By Suit",
-    }),
-  ]);
-
-  const mainPlayerDiv = elementCreator("div", {
-    id: `${player}`,
-    className: "player",
-  });
-
-  childrenAppender(mainPlayerDiv, [
-    playerNameAndPassPlayButtons,
-    elementCreator("div", {
-      id: `${player}-hand-container`,
-      className: "hand-container",
-    }),
-    sortButtonsDiv,
-  ]);
-
-  playersDiv.appendChild(mainPlayerDiv);
-});
+}

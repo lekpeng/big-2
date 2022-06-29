@@ -14,22 +14,143 @@
     <title>Play Big 2!</title>
   </head>
   <body>
-    <div class="container">
-      <div class="board">
-        <div class="players"></div>
-        <!-- CENTER BOARD -->
-        <div id="center-board" class="text-center">
-          <!-- INSTRUCTIONS -->
-          <div id="instructions-and-playing-pile">
-            <div id="instructions">Welcome to Big 2!</br>Please wait while we distribute the cards.</div>
-            <div id="playing-pile-container">
-              <div class="previous-turn">
-                <p>Previous turn</p>
-                <div class="previous-turn-container"></div>
+    <div class="main">
+      <div class="menu">
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#about-modal"
+        >
+          About
+        </button>
+        <!-- Modal -->
+        <div class="modal fade" id="about-modal" tabindex="-1">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="about-modal-title">How to Play Big 2</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
               </div>
-              <div class="current-turn">
-                <p>Current turn</p>
-                <div class="current-turn-container"></div>
+              <div class="modal-body">
+                <h6>Introduction</h6>
+                <p>
+                  Big Two (also known as Dai Di in Cantonese) is a shedding card game. The game is
+                  very popular in East Asia and Southeast Asia, especially in China, Hong Kong,
+                  Vietnam, Macau, Taiwan, Indonesia, Philippines, Malaysia and Singapore. Best
+                  played among four players, the game's objective is to be the first to empty one's
+                  hand of all cards.
+                </p>
+                <h6>Basic Gameplay</h6>
+                <p>
+                  A standard 52 card pack is used, the cards ranking from high to low:
+                  2-A-K-Q-J-10-9-8-7-6-5-4-3. (Hence the name, Big Two). There is also an ordering
+                  of suits - from high to low: spades, hearts, clubs, diamonds.
+                </p>
+                <p>
+                  For each round, players will have to play one of the following three types of
+                  legal play: single cards, pairs, and five card groups. The type will be chosen by
+                  the player who makes the first turn in each round. (More on this later.)
+                </p>
+                <p>
+                  The player who holds the three of diamonds begins the first round and must play
+                  this card, using one of the three types of legal play. Following a clockwise
+                  rotation, players continue to either "Play" or "Pass", the latter involving
+                  playing no cards.
+                </p>
+                <p>
+                  This may continue for several circuits, until three players pass consecutively.
+                  When this happens, the player who put the last card can begin a new round and play
+                  any card or legal combination of cards.
+                </p>
+                <p>The game ends when one of the players has played all their cards.</p>
+                <p>
+                  The next three sections will focus on the three aforementioned types of legal
+                  play.
+                </p>
+
+                <h6>Single cards</h6>
+                <p>
+                  These rank from two (high) down to three (low), and between cards of the same rank
+                  a higher suit beats a lower suit.
+                </p>
+
+                <h6>Pairs</h6>
+                <p>
+                  A pair of equal ranked cards - twos are highest and threes are lowest. <br />
+                  Between equal ranked pairs, the one containing the highest suit is better - for
+                  example a 9 of spades and 9 of diamonds will beat the other pair of 9's.
+                </p>
+
+                <h6>Five card groups</h6>
+                <p>
+                  There five types of playable five-card combination. In ascending order they are:
+                  Straight, Flush, Full House, Four Of A Kind, and Straight Flush.
+                </p>
+                <ol>
+                  <li>
+                    A Straight consists of five cards of consecutive rank with mixed suits.<br />
+                    When comparing straights, the set with the higher rank card is better, with
+                    suits of the highest rank card being used as a tie-breaker. <br />
+                    In other words: <br />
+                    3-4-5-6-7 < ... < 10-J-Q-K-A < 2-3-4-5-6 < A-2-3-4-5, and <br />
+                    3-4-5-6-7 with the 7 of spades will beat 3-4-5-6-7 with the 7 of hearts,
+                    regardless of the suits of the other 8 cards.
+                  </li>
+                  <li>
+                    A Flush consists of any five cards of the same suit. <br />
+                    A flush in a higher suit beats a flush in a lower suit. The highest rank card of
+                    each flushe is used as a tie-breaker when both players play the same suit in
+                    their flushes. <br />
+                    For example, 3-5-6-7-9, all in hearts, will beat 9-10-J-K-2, all in clubs, which
+                    beats 5-6-7-8-A, all in clubs.
+                  </li>
+                  <li>
+                    A Full House consists of three cards of one rank and two of another rank <br />
+                    Between two full houses, the one whose triple is of higher rank is better - so
+                    for example 9-9-9-4-4 beats 8-8-8-K-K.
+                  </li>
+                  <li>
+                    A Four Of A Kind is made up of all four cards of one rank, plus any fifth card.
+                    <br />
+                    Between two fours of a kind, the rank of the four cards determines which is
+                    higher.
+                  </li>
+                  <li>
+                    A Straight Flush is five cards that are simultaneously a Straight and a Flush.
+                  </li>
+                </ol>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button type="button">Restart</button>
+      </div>
+
+      <div class="game-play">
+        <div class="board">
+          <div class="players"></div>
+          <!-- CENTER BOARD -->
+          <div id="center-board" class="text-center">
+            <!-- INSTRUCTIONS -->
+            <div id="instructions-and-playing-pile">
+              <div id="instructions">
+                Welcome to Big 2! Please wait while we distribute the cards.
+              </div>
+              <div id="playing-pile-container">
+                <div class="previous-turn">
+                  <!-- <p>Previous turn</p> -->
+                  <div class="previous-turn-container"></div>
+                </div>
+                <div class="current-turn">
+                  <!-- <p>Current turn</p> -->
+                  <div class="current-turn-container"></div>
+                </div>
               </div>
             </div>
           </div>

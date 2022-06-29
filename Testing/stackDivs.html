@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+      .current-turn {
+        position: relative;
+        top: -260px;
+      }
+
+      .current-turn,
+      .previous-turn {
+        background-color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="playing-pile-container">
+      <div class="previous-turn">
+        <!-- <p>Previous turn</p> -->
+        <div class="previous-turn-container">
+          <img
+            src="https://deckofcardsapi.com/static/img/8C.png"
+            class="player-holding cards"
+            id="8C"
+          />
+        </div>
+      </div>
+      <div class="current-turn">
+        <!-- <p>Current turn</p> -->
+        <div class="current-turn-container">
+          <img
+            src="https://deckofcardsapi.com/static/img/8C.png"
+            class="player-holding cards"
+            id="8S"
+          />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

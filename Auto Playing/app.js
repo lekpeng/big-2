@@ -1,15 +1,15 @@
 // TODO:
 // 1) Use the alerts thing (modal) from bootstrap when player makes invalid move instead of using the instructions div
 // 2) [DONE] Make cards and buttons of computer players not visible.
-// 3) Let user input their name instead of generic "PLAYER" (modal pop up) and local storage
-// 4) Mobile playing.
-// 5) deckID should be unique for each player so that multiple people can play at the same time -
-// Use API to retrieve for the first time, then try putting and retrieving from local cache from then on.
+// 3) *Let user input their name instead of generic "PLAYER" (modal pop up) and local storage
+// 4) [NO TIME] Mobile playing.
+// 5) *deckID should be unique for each player so that multiple people can play at the same time -
+//    Use API to retrieve for the first time, then try putting and retrieving from local cache from then on.
 // 6) Clean code.
 // 7) The valid class for computer players maybe an over kill.
-// 8) Restart button
-// 9) Change the CSS of the playing pile so that they stack and it's clearer which is the "later" card
-// 10) Add about page to introduce games and explain rules
+// 8) **Restart button
+// 9) [DONE] Change the CSS of the playing pile so that they stack and it's clearer which is the "later" card
+// 10) [DONE] Add about page to introduce games and explain rules
 
 const deckID = "tyu78tcx00jy";
 const urlShuffle = `https://deckofcardsapi.com/api/deck/${deckID}/shuffle/`;
@@ -521,6 +521,10 @@ class Valid {
       BigTwoGame.fiveCardsRank[this.currentRound.cardsToBeatTypeIfFiveCard];
 
     if (fiveCardsRankCurrPlayer !== fiveCardsRankToBeat) {
+      if (fiveCardsRankCurrPlayer < fiveCardsRankToBeat) {
+        console.log("fiveCardsRankCurrPlayer", fiveCardsRankCurrPlayer);
+        console.log("fiveCardsRankToBeat", fiveCardsRankToBeat);
+      }
       return fiveCardsRankCurrPlayer > fiveCardsRankToBeat;
     }
 
@@ -848,6 +852,7 @@ class BigTwoGame {
   }
 
   async startGame() {
+    await setUpHTML();
     await this.distributeCards();
 
     // Event listeners for sorting buttons
