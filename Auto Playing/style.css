@@ -1,19 +1,17 @@
-body {
-  font-family: "Arial", Helvetica, sans-serif;
-  /* --w: min(125vh, var(--maxw));
-  --maxw: calc(93vw - 2 * var(--ph));
-  --h: 125vh; */
-  --w: 125vh;
-  --h: var(--w);
-  --ph: 25vh;
+:root {
+  --w: calc(0.74 * 93vw);
+  --ph: calc(0.13 * 93vw);
   --p1: 180deg;
   --p2: 270deg;
   --p3: 0deg;
   --p4: 90deg;
 }
+body {
+  font-family: "Arial", Helvetica, sans-serif;
+  margin: auto;
+}
 
 button {
-  margin-left: 0.5em;
   font-size: 0.8em;
 }
 
@@ -23,13 +21,15 @@ button {
   justify-content: center;
 }
 
+/* MENU */
 .menu {
   flex-basis: 5%;
-  flex-shrink: 0;
 }
 
 .menu button {
   display: block;
+  margin-left: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 /* ABOUT */
@@ -52,8 +52,7 @@ button {
   font-size: 0.8em;
 }
 
-/* INDEX */
-
+/* HOME PAGE (specific to index.html */
 .introduction h1 {
   text-align: center;
 }
@@ -74,21 +73,17 @@ button {
   margin-top: 5em;
 }
 
-.menu button {
-  margin-bottom: 0.5em;
-}
-
 a:link,
 a:visited {
   color: white;
   text-decoration: none;
 }
 
-/* GAME */
+/* GAME (specific to game.html)*/
 
 /* cards */
 .cards {
-  width: 9vh;
+  width: calc(var(--w) / 15);
   padding: 0 2px;
   cursor: pointer;
 }
@@ -97,7 +92,7 @@ a:visited {
 #com-2 .cards,
 #com-3 .cards {
   filter: brightness(0%);
-  width: 6vh;
+  width: calc(100vh / 16);
 }
 
 .cards[title="selected"] {
@@ -108,15 +103,14 @@ a:visited {
   box-shadow: none;
 }
 
-/* board */
 .game-play,
 .introduction {
   margin: auto;
+  width: 100%;
   width: calc(var(--w) + calc(2 * var(--ph)));
 }
 
 .introduction {
-  border: black solid;
   height: 100vh;
   padding-top: 2em;
   padding-left: 10em;
@@ -126,12 +120,15 @@ a:visited {
 .board {
   position: relative;
   width: calc(var(--w) + calc(2 * var(--ph)));
-  height: calc(var(--h) - var(--ph));
+  height: 100vh;
 }
 
 /* players */
+.players {
+  height: 100vh;
+}
+
 .player {
-  width: calc(var(--w) - var(--ph));
   height: var(--ph);
   transform-origin: calc(var(--ph) / 2) calc(var(--ph) / 2);
   box-sizing: border-box;
@@ -152,13 +149,14 @@ a:visited {
 .player:nth-child(2) {
   --xp: calc(calc(3 * var(--ph)) - var(--w));
   --yp: calc(var(--w) + calc(1 * var(--ph)));
-  transform: rotate(var(--p2)) translate(var(--xp), var(--yp));
+  transform: rotate(var(--p2)) translate(calc(-100vh + calc(2 * var(--ph))), var(--yp));
+  width: 100vh;
   background-color: skyblue;
 }
 
 .player:nth-child(3) {
   --yp: calc(var(--w) - calc(4 * var(--ph)));
-  transform: rotate(var(--p3)) translate(var(--ph), var(--yp));
+  transform: rotate(var(--p3)) translate(var(--ph), calc(100vh - calc(3 * var(--ph))));
   width: var(--w);
   background-color: rgb(95, 255, 95);
 }
@@ -166,6 +164,7 @@ a:visited {
 .player:nth-child(4) {
   --xp: calc(0em - calc(3 * var(--ph)));
   transform: rotate(var(--p4)) translate(var(--xp), 0);
+  width: 100vh;
   background-color: pink;
 }
 
@@ -184,6 +183,10 @@ a:visited {
   justify-content: center;
 }
 
+.player button {
+  margin-left: 0.5em;
+}
+
 .sort-buttons {
   text-align: right;
 }
@@ -197,7 +200,7 @@ a:visited {
 /* CENTER BOARD */
 #center-board {
   --dw: var(--w);
-  --dh: calc(var(--w) - calc(3 * var(--ph)));
+  --dh: calc(100vh - calc(2 * var(--ph)));
   position: absolute;
   top: var(--ph);
   left: var(--ph);
@@ -224,16 +227,20 @@ a:visited {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 1em;
 }
 
 #playing-pile-container {
+  --ch: calc(0.7 * calc(90vh - calc(2 * var(--ph))));
   background-color: black;
+  height: var(--ch);
+  overflow: hidden;
 }
 
 #playing-pile-container > * {
   margin-top: 1em;
   background-color: maroon;
-  height: 12vh;
+  height: calc(0.33 * calc(100vh - calc(2 * var(--ph))));
   border-radius: 10px;
 }
 
@@ -249,6 +256,6 @@ a:visited {
 
 .current-turn {
   position: relative;
-  top: -10vh;
+  top: -75px;
   align-items: flex-start;
 }

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New test</title>
+    <style>
+      :root {
+        /* width of the whole board */
+        --w: 125vh;
+        --h: var(--w);
+        --ph: 25vh;
+        --p1: 180deg;
+        --p2: 270deg;
+        --p3: 0deg;
+        --p4: 90deg;
+      }
+
+      .main {
+        display: flex;
+        width: 100%;
+        border: solid black;
+        justify-content: center;
+      }
+
+      .menu {
+        flex-basis: 5%;
+      }
+      .board {
+        position: relative;
+        width: calc(var(--w) + calc(2 * var(--ph)));
+        height: calc(var(--h) - var(--ph));
+      }
+
+      .player {
+        width: calc(var(--w) - var(--ph));
+        height: var(--ph);
+        transform-origin: calc(var(--ph) / 2) calc(var(--ph) / 2);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+        border: solid black;
+      }
+
+      body {
+        margin: auto;
+        width: calc(var(--w) + calc(2 * var(--ph)));
+      }
+
+      #com2 img,
+      #player img {
+        width: 7vh;
+      }
+
+      #com1 img,
+      #com3 img {
+        width: 5vh;
+      }
+
+      #pile {
+        --dw: var(--w);
+        --dh: calc(var(--w) - calc(3 * var(--ph)));
+        position: absolute;
+        top: var(--ph);
+        left: var(--ph);
+        width: var(--dw);
+        height: var(--dh);
+        background-color: green;
+        border: purple solid;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .player:nth-child(1) {
+        --xp: calc(0em - var(--w));
+        /* --xp: calc(var(--ph) - var(--w)); */
+        transform: rotate(var(--p1)) translate(var(--xp), 0);
+        width: var(--w);
+        background-color: yellow;
+      }
+
+      .player:nth-child(2) {
+        --xp: calc(calc(3 * var(--ph)) - var(--w));
+        --yp: calc(var(--w) + calc(1 * var(--ph)));
+        transform: rotate(var(--p2)) translate(var(--xp), var(--yp));
+        background-color: orange;
+      }
+
+      .player:nth-child(3) {
+        --yp: calc(var(--w) - calc(4 * var(--ph)));
+        transform: rotate(var(--p3)) translate(var(--ph), var(--yp));
+        width: var(--w);
+        background-color: lime;
+      }
+
+      .player:nth-child(4) {
+        --xp: calc(0em - calc(3 * var(--ph)));
+        transform: rotate(var(--p4)) translate(var(--xp), 0);
+        background-color: pink;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main">
+      <div class="menu">Hi</div>
+      <div class="board">
+        <div class="players">
+          <div id="com2" class="player">
+            <p>COM 2</p>
+            <div class="hand">
+              <img src="cards/1.png" alt="" />
+              <img src="cards/2.png" alt="" />
+              <img src="cards/3.png" alt="" />
+              <img src="cards/1.png" alt="" />
+              <img src="cards/2.png" alt="" />
+              <img src="cards/3.png" alt="" />
+              <img src="cards/1.png" alt="" />
+              <img src="cards/2.png" alt="" />
+              <img src="cards/3.png" alt="" />
+              <img src="cards/1.png" alt="" />
+              <img src="cards/2.png" alt="" />
+              <img src="cards/3.png" alt="" />
+              <img src="cards/3.png" alt="" />
+            </div>
+          </div>
+          <div id="com3" class="player">
+            <p>COM 3</p>
+            <div class="hand">
+              <img src="cards/9.png" alt="" />
+              <img src="cards/7.png" alt="" />
+              <img src="cards/8.png" alt="" />
+              <img src="cards/9.png" alt="" />
+              <img src="cards/7.png" alt="" />
+              <img src="cards/8.png" alt="" />
+              <img src="cards/9.png" alt="" />
+              <img src="cards/7.png" alt="" />
+              <img src="cards/8.png" alt="" />
+              <img src="cards/9.png" alt="" />
+              <img src="cards/9.png" alt="" />
+            </div>
+          </div>
+          <div id="player" class="player">
+            <p>Player</p>
+            <div class="hand">
+              <img src="cards/10.png" alt="" />
+              <img src="cards/11.png" alt="" />
+              <img src="cards/12.png" alt="" />
+              <img src="cards/10.png" alt="" />
+              <img src="cards/11.png" alt="" />
+              <img src="cards/12.png" alt="" />
+              <img src="cards/10.png" alt="" />
+              <img src="cards/11.png" alt="" />
+              <img src="cards/12.png" alt="" />
+              <img src="cards/10.png" alt="" />
+              <img src="cards/11.png" alt="" />
+              <img src="cards/7.png" alt="" />
+              <img src="cards/8.png" alt="" />
+            </div>
+          </div>
+          <div id="com1" class="player">
+            <p>COM 1</p>
+            <div class="hand">
+              <img src="cards/4.png" alt="" />
+              <img src="cards/5.png" alt="" />
+              <img src="cards/6.png" alt="" />
+              <img src="cards/4.png" alt="" />
+              <img src="cards/5.png" alt="" />
+              <img src="cards/6.png" alt="" />
+              <img src="cards/4.png" alt="" />
+              <img src="cards/5.png" alt="" />
+              <img src="cards/6.png" alt="" />
+              <img src="cards/4.png" alt="" />
+              <img src="cards/5.png" alt="" />
+              <img src="cards/6.png" alt="" />
+              <img src="cards/6.png" alt="" />
+            </div>
+          </div>
+        </div>
+
+        <div id="pile">
+          <p>Playing Pile</p>
+          <div class="hand"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
