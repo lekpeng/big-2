@@ -1,4 +1,8 @@
-:root {
+body {
+  font-family: "Arial", Helvetica, sans-serif;
+  /* --w: min(125vh, var(--maxw));
+  --maxw: calc(93vw - 2 * var(--ph));
+  --h: 125vh; */
   --w: 125vh;
   --h: var(--w);
   --ph: 25vh;
@@ -8,10 +12,9 @@
   --p4: 90deg;
 }
 
-body {
-  /* margin: auto;
-  width: calc(var(--w) + calc(2 * var(--ph))); */
-  font-family: "Arial", Helvetica, sans-serif;
+button {
+  margin-left: 0.5em;
+  font-size: 0.8em;
 }
 
 .main {
@@ -22,35 +25,80 @@ body {
 
 .menu {
   flex-basis: 5%;
+  flex-shrink: 0;
 }
 
 .menu button {
   display: block;
 }
 
-button {
-  margin-left: 0.5em;
+/* ABOUT */
+.modal-header {
+  margin-top: 2em;
+  margin-left: 2em;
+}
+
+.modal-body {
+  margin: 0 2em;
+}
+
+.modal h5,
+.modal h6 {
+  font-weight: bold;
+}
+
+.modal p,
+.modal li {
   font-size: 0.8em;
 }
 
-/* CARDS */
+/* INDEX */
+
+.introduction h1 {
+  text-align: center;
+}
+
+.introduction h6 {
+  font-style: italic;
+  margin-top: 1.5em;
+  margin-bottom: 5em;
+}
+
+.player-name-form-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#start-game-button {
+  margin-top: 5em;
+}
+
+.menu button {
+  margin-bottom: 0.5em;
+}
+
+a:link,
+a:visited {
+  color: white;
+  text-decoration: none;
+}
+
+/* GAME */
+
+/* cards */
 .cards {
   width: 9vh;
   padding: 0 2px;
-  /* margin: 0 3px; */
   cursor: pointer;
 }
 
 #com-1 .cards,
 #com-2 .cards,
 #com-3 .cards {
+  filter: brightness(0%);
   width: 6vh;
 }
-
-/* #player .cards:hover,
-#playing-pile-container .cards:hover {
-  transform: scale(1.5);
-} */
 
 .cards[title="selected"] {
   box-shadow: 0 0 10px 5px black;
@@ -60,7 +108,7 @@ button {
   box-shadow: none;
 }
 
-/* BOARD */
+/* board */
 .game-play,
 .introduction {
   margin: auto;
@@ -81,7 +129,7 @@ button {
   height: calc(var(--h) - var(--ph));
 }
 
-/* PLAYER  */
+/* players */
 .player {
   width: calc(var(--w) - var(--ph));
   height: var(--ph);
@@ -132,25 +180,18 @@ button {
 
 .hand-container {
   margin: 0.5em 0;
-  /* so that we can order cards */
   display: flex;
   justify-content: center;
 }
 
-#com-1 .cards,
-#com-2 .cards,
-#com-3 .cards {
-  filter: brightness(0%);
+.sort-buttons {
+  text-align: right;
 }
 
 #com-1 button,
 #com-2 button,
 #com-3 button {
   visibility: hidden;
-}
-
-.sort-buttons {
-  text-align: right;
 }
 
 /* CENTER BOARD */
@@ -210,56 +251,4 @@ button {
   position: relative;
   top: -10vh;
   align-items: flex-start;
-}
-
-.modal-header {
-  margin-top: 2em;
-  margin-left: 2em;
-}
-
-.modal-body {
-  margin: 0 2em;
-}
-
-.modal h5 {
-  font-weight: bold;
-}
-
-.modal h6 {
-  font-weight: bold;
-}
-
-.modal p,
-.modal li {
-  font-size: 0.8em;
-}
-
-.introduction h1 {
-  text-align: center;
-}
-
-.introduction h6 {
-  font-style: italic;
-  margin-top: 1.5em;
-  margin-bottom: 5em;
-}
-
-.player-name-form-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-#start-game-button {
-  margin-top: 5em;
-}
-#about-button {
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
-}
-
-a:link,
-a:visited {
-  color: white;
-  text-decoration: none;
 }

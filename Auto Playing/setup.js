@@ -18,7 +18,7 @@ function childrenAppender(parentElm, childrenElms) {
   });
 }
 
-// Set up HTML for players
+// Get IDs and names of players
 const players = ["com-2", "com-3", "player", "com-1"];
 const playersDiv = document.querySelector(".players");
 
@@ -31,6 +31,18 @@ if (Object.keys(localStorage).includes("player-name")) {
   playersToPlayerNamesMapping["player"] = localStorage["player-name"];
 }
 
+// Event listener for music
+document.querySelector("#toggle-audio").addEventListener("click", (event) => {
+  if (event.target.className === "btn btn-danger") {
+    event.target.className = "btn btn-success";
+    document.querySelector("audio").play();
+  } else {
+    event.target.className = "btn btn-danger";
+    document.querySelector("audio").pause();
+  }
+});
+
+// Set up HTML
 function setUpHTML() {
   players.forEach((player) => {
     const playPassButtonsDiv = elementCreator("div", {
@@ -93,6 +105,6 @@ function setUpHTML() {
       sortButtonsDiv,
     ]);
 
-    playersDiv.appendChild(mainPlayerDiv);
+    childrenAppender(playersDiv, [mainPlayerDiv]);
   });
 }

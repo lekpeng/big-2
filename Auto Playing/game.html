@@ -10,7 +10,7 @@
       integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="test.css" />
+    <link rel="stylesheet" href="./style.css" />
     <title>Play Big 2!</title>
   </head>
   <body>
@@ -88,8 +88,8 @@
 
                 <h6>Five card groups</h6>
                 <p>
-                  There five types of playable five-card combination. In ascending order they are:
-                  Straight, Flush, Full House, Four Of A Kind, and Straight Flush.
+                  There are five types of playable five-card combinations. In ascending order they
+                  are: Straight, Flush, Full House, Four Of A Kind, and Straight Flush.
                 </p>
                 <ol>
                   <li>
@@ -137,7 +137,11 @@
             </div>
           </div>
         </div>
-        <button type="button" class="btn btn-primary"><a href="./test.html">Restart</a></button>
+        <button type="button" class="btn btn-primary"><a href="./game.html">Restart</a></button>
+        <button type="button" id="toggle-audio" class="btn btn-danger">Audio</button>
+        <audio id="background-music" loop>
+          <source src="./raindrop-flower.mp3" type="audio/mpeg" />
+        </audio>
       </div>
 
       <div class="game-play">
@@ -170,7 +174,7 @@
       integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
       crossorigin="anonymous"
     ></script>
-    <script src="setup.js"></script>
-    <script src="app.js"></script>
+    <script src="./setup.js"></script>
+    <script src="./app.js"></script>
   </body>
 </html>

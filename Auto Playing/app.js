@@ -1,16 +1,13 @@
-// TODO:
-// 1) Use the alerts thing (modal) from bootstrap when player makes invalid move instead of using the instructions div
-// 2) [DONE] Make cards and buttons of computer players not visible.
-// 3) [DONE] Let user input their name instead of generic "PLAYER" (modal pop up) and local storage
-// 4) [NO TIME] Mobile playing.
-// 5) [DONE] deckID should be unique for each player so that multiple people can play at the same time -
-//    Use API to retrieve for the first time, then try putting and retrieving from local cache from then on.
-// 6) Clean code.
-// 7) The valid class for computer players maybe an over kill.
-// 8) [DONE] Restart button
-// 9) [DONE] Change the CSS of the playing pile so that they stack and it's clearer which is the "later" card
-// 10) [DONE] Add about page to introduce games and explain rules
-// 11) [DONE] Reflect the cards played by players.
+// TODO (IN FUTURE):
+// 1) Use the alerts when player makes invalid move instead of using the instructions div
+// 2) Mobile playing.
+// 3) Add a countdown for players to pass/play
+// 4) Make AIs smarter using reinforecement learning
+
+// TO DO (NOW):
+// 1) Clean code.
+// 2) Do READ ME.
+// 3) Improve CSS
 
 const urlGetDeckID = "https://deckofcardsapi.com/api/deck/new/shuffle/";
 let deckID = "";
@@ -68,13 +65,15 @@ class Computer {
     this.cardCodes = [];
   }
 
-  removeCodesFromArrAlt(codesToRemove, arrayToRemoveFrom = this.cardCodes) {
+  // example use: removes [7,7] from our list of doubles [[7,7], [8,8], [9,9]] when we play double 7
+  removeSingleElmFromArr(codesToRemove, arrayToRemoveFrom = this.cardCodes) {
     arrayToRemoveFrom.splice(arrayToRemoveFrom.indexOf(codesToRemove), 1);
   }
 
-  removeCodesFromArr(codesToRemove, arrayToRemoveFrom = this.cardCodes) {
-    codesToRemove.forEach((code) => {
-      arrayToRemoveFrom.splice(arrayToRemoveFrom.indexOf(code), 1);
+  // example use: removes [7,7] from [7,7,8,10] to store as a double (part of partitioning process)
+  removeMultipleElmsFromArr(codesToRemove, arrayToRemoveFrom = this.cardCodes) {
+    codesToRemove.forEach((codes) => {
+      this.removeSingleElmFromArr(codes, arrayToRemoveFrom);
     });
   }
 
@@ -89,7 +88,7 @@ class Computer {
       if (arr.slice(i + 1, i + numSame).every((code) => code[0] === valueToCompare)) {
         bool = true;
         found = arr.slice(i, i + numSame);
-        this.removeCodesFromArr(found);
+        this.removeMultipleElmsFromArr(found);
         break;
       }
     }
@@ -131,7 +130,7 @@ class Computer {
           if (possibleStraightFlush.length === 4) {
             const straightFlush = [startOfStraightFlush, ...possibleStraightFlush];
             this.fiveCardCodes.straightflush.push(straightFlush);
-            this.removeCodesFromArr(straightFlush);
+            this.removeMultipleElmsFromArr(straightFlush);
             break;
           }
         }
@@ -144,7 +143,7 @@ class Computer {
     if (checkQuadruple.bool) {
       const fourOfAKind = [this.cardCodes[0], ...checkQuadruple.found];
       this.fiveCardCodes.fourofakind.push(fourOfAKind);
-      this.removeCodesFromArr([this.cardCodes[0]]);
+      this.removeMultipleElmsFromArr([this.cardCodes[0]]);
     } else {
       // return the quadruple
       checkQuadruple.found.forEach((single) => {
@@ -178,7 +177,7 @@ class Computer {
       if (divideBySuits[key].length >= 5) {
         const flushCards = divideBySuits[key].slice(0, 5);
         this.fiveCardCodes.flush.push(flushCards);
-        this.removeCodesFromArr(flushCards);
+        this.removeMultipleElmsFromArr(flushCards);
         break;
       }
     }
@@ -205,7 +204,7 @@ class Computer {
       if (possibleStraight.length === 4) {
         const straight = [startOfStraight, ...possibleStraight];
         this.fiveCardCodes.straight.push(straight);
-        this.removeCodesFromArr(straight);
+        this.removeMultipleElmsFromArr(straight);
         break;
       }
     }
@@ -249,7 +248,7 @@ class Computer {
       const randomStackChosen = possibleStacks[Math.floor(Math.random() * possibleStacks.length)];
       const cardCodes = randomStackChosen[0];
       this.select(cardCodes);
-      this.removeCodesFromArrAlt(cardCodes, randomStackChosen);
+      this.removeSingleElmFromArr(cardCodes, randomStackChosen);
     }
   }
 
@@ -275,7 +274,7 @@ class Computer {
       if (check.validBeatsOpponent1Or2Cards()) {
         // if (this.validBeatsOpponent1Or2Cards(numCards, cardCodes, this.currentRound.cardsToBeat)) {
         this.select(cardCodes);
-        this.removeCodesFromArrAlt(cardCodes, cardsToCheck);
+        this.removeSingleElmFromArr(cardCodes, cardsToCheck);
         return;
       }
     }
@@ -294,7 +293,7 @@ class Computer {
           const check = new Valid(cardCodes, this.currentRound);
           if (check.validBeatsOpponent5Cards(rankToCheck)) {
             this.select(cardCodes);
-            this.removeCodesFromArrAlt(cardCodes, cardsToCheck);
+            this.removeSingleElmFromArr(cardCodes, cardsToCheck);
             return;
           }
         }
