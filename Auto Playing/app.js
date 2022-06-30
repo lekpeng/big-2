@@ -7,10 +7,10 @@
 //    Use API to retrieve for the first time, then try putting and retrieving from local cache from then on.
 // 6) Clean code.
 // 7) The valid class for computer players maybe an over kill.
-// 8) **Restart button
+// 8) [DONE] Restart button
 // 9) [DONE] Change the CSS of the playing pile so that they stack and it's clearer which is the "later" card
 // 10) [DONE] Add about page to introduce games and explain rules
-// 11) Reflect the cards played by players.
+// 11) [DONE] Reflect the cards played by players.
 
 const urlGetDeckID = "https://deckofcardsapi.com/api/deck/new/shuffle/";
 let deckID = "";
@@ -523,10 +523,6 @@ class Valid {
       BigTwoGame.fiveCardsRank[this.currentRound.cardsToBeatTypeIfFiveCard];
 
     if (fiveCardsRankCurrPlayer !== fiveCardsRankToBeat) {
-      if (fiveCardsRankCurrPlayer < fiveCardsRankToBeat) {
-        console.log("fiveCardsRankCurrPlayer", fiveCardsRankCurrPlayer);
-        console.log("fiveCardsRankToBeat", fiveCardsRankToBeat);
-      }
       return fiveCardsRankCurrPlayer > fiveCardsRankToBeat;
     }
 
@@ -536,8 +532,15 @@ class Valid {
 
     if (fiveCardsRankToBeat === 1 || fiveCardsRankToBeat === 5) {
       // Comparing straights flushes and straights
-      // Will have to change this later to reflect the difference in last two below:
-      // 3,4,5,6,7 < ... < 10,j,q,k,a < 2,3,4,5,6 < A,2,3,4,5
+
+      if (
+        this.cards[4][0] === "2" &&
+        this.currentRound.cardsToBeat[4][0] === "2" &&
+        this.cards[3][0] !== this.currentRound.cardsToBeat[3][0]
+      ) {
+        // edge case: 2,3,4,5,6 < A,2,3,4,5 (sorted they are: 3,4,5,6,2 and 3,4,5,A,2)
+        return this.validBeatsOpponent1Or2Cards(1, this.cards[3], this.currentRound.cardsToBeat[3]);
+      }
       return this.validBeatsOpponent1Or2Cards(1, this.cards[4], this.currentRound.cardsToBeat[4]);
     } else if (fiveCardsRankToBeat === 2) {
       // Comparing flushes
@@ -602,6 +605,7 @@ class Round {
       this.isFirstTurn = false;
       this.numCardsAllowed = cardsArr.length;
     }
+
     this.cardsToBeat = cardsArr;
     playerNumCardsThrown[this.turn] += cardsArr.length;
 
@@ -610,7 +614,7 @@ class Round {
         `The winner is ${playersToPlayerNamesMapping[this.foundWinningPlayer()]}`
       );
     } else {
-      this.changeTurn("play");
+      this.changeTurn("play", cardsArr);
       this.makeComputerPlay();
     }
   }
@@ -620,12 +624,23 @@ class Round {
     return players.find((player) => playerNumCardsThrown[player] === 13);
   }
 
-  changeTurn(type) {
+  changeTurn(type, cardsArr) {
     const prevTurn = this.turn;
     this.turn = players[(players.indexOf(this.turn) + 1) % 4];
     if (type === "play") {
+      let cardsPlayed;
+
+      if (cardsArr.length === 1) {
+        cardsPlayed = `the ${BigTwoGame.valuesNameMapping[cardsArr[0][0]]} of ${
+          BigTwoGame.suitsNameMapping[cardsArr[0][1]]
+        }`;
+      } else if (cardsArr.length === 2) {
+        cardsPlayed = `a pair of ${BigTwoGame.valuesNameMapping[cardsArr[0][0]]}s`;
+      } else {
+        cardsPlayed = `a ${BigTwoGame.fiveCardsRankNameMapping[this.cardsToBeatTypeIfFiveCard]}`;
+      }
       this.setInstructionsInDOM(
-        `${playersToPlayerNamesMapping[prevTurn]} has played their turn!\nIt is now ${
+        `${playersToPlayerNamesMapping[prevTurn]} played ${cardsPlayed}!\nIt is now ${
           playersToPlayerNamesMapping[this.turn]
         }'s turn!`
       );
@@ -676,6 +691,35 @@ class Round {
 }
 
 class BigTwoGame {
+  static suitsNameMapping = {
+    D: "Diamonds",
+    C: "Clubs",
+    H: "Hearts",
+    S: "Spades",
+  };
+
+  static valuesNameMapping = {
+    3: "3",
+    4: "4",
+    5: "5",
+    6: "6",
+    7: "7",
+    8: "8",
+    9: "9",
+    0: "10",
+    J: "Jack",
+    Q: "Queen",
+    K: "King",
+    A: "Ace",
+    2: "2",
+  };
+  static fiveCardsRankNameMapping = {
+    straight: "Straight",
+    flush: "Flush",
+    fullhouse: "Full House",
+    fourofakind: "Four of a Kind",
+    straightflush: "Straight Flush",
+  };
   static suitsRank = {
     D: 1,
     C: 2,

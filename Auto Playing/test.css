@@ -1,5 +1,5 @@
 :root {
-  --w: 120vh;
+  --w: 125vh;
   --h: var(--w);
   --ph: 25vh;
   --p1: 180deg;
@@ -27,11 +27,6 @@ body {
 .menu button {
   display: block;
 }
-
-/* p {
-  margin-bottom: 0.3em;
-  font-size: 0.8em;
-} */
 
 button {
   margin-left: 0.5em;
