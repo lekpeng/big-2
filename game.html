@@ -16,37 +16,18 @@
   <body>
     <div class="main">
       <div class="menu">
-        <!-- <nav class="navbar navbar-expand-lg bg-white"> -->
-        <nav class="navbar bg-white">
-          <div class="container-fluid">
-            <ul class="navbar-nav">
-              <div class="d-flex flex-column">
-                <li class="nav-item">
-                  <a class="nav-link" href="./index.html">Home</a>
-                </li>
-                <li class="nav-item">
-                  <a
-                    class="nav-link"
-                    style="cursor: pointer"
-                    data-bs-toggle="modal"
-                    data-bs-target="#about-modal"
-                    >About</a
-                  >
-                </li>
-                <li class="nav-item text-center">
-                  <a class="nav-link" id="restart-button" href="./game.html">Restart</a>
-                </li>
-                <li class="nav-item text-center">
-                  <a class="nav-link" id="audio-button">Audio</a>
-                </li>
-              </div>
-            </ul>
-          </div>
-        </nav>
-        <!-- Background music -->
-        <audio id="background-music" loop>
-          <source src="./music/raindrop-flower.mp3" type="audio/mpeg" />
-        </audio>
+        <button type="button" class="btn btn-primary">
+          <a href="./index.html">Home</a>
+        </button>
+        <button
+          id="about-button"
+          type="button"
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#about-modal"
+        >
+          About
+        </button>
         <!-- Modal -->
         <div class="modal fade" id="about-modal" tabindex="-1">
           <div class="modal-dialog modal-xl">
@@ -156,6 +137,11 @@
             </div>
           </div>
         </div>
+        <button type="button" class="btn btn-primary"><a href="./game.html">Restart</a></button>
+        <button type="button" id="toggle-audio" class="btn btn-danger">Audio</button>
+        <audio id="background-music" loop>
+          <source src="./music/raindrop-flower.mp3" type="audio/mpeg" />
+        </audio>
       </div>
 
       <div class="game-play">
