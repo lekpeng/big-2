@@ -1,14 +1,3 @@
-// TODO (IN FUTURE):
-// 1) Use the alerts when player makes invalid move instead of using the instructions div
-// 2) Mobile playing.
-// 3) Add a countdown for players to pass/play
-// 4) Make AIs smarter using reinforecement learning
-
-// TO DO (NOW):
-// 1) Clean code.
-// 2) Do READ ME.
-// 3) Improve CSS
-
 const urlGetDeckID = "https://deckofcardsapi.com/api/deck/new/shuffle/";
 let deckID = "";
 let urlShuffle = "";
@@ -582,7 +571,6 @@ class Round {
     this.numCardsAllowed;
     this.computers = computers;
   }
-  // WAIT FUNCTION
 
   addToPlayingPile(cardsArr) {
     // Remove anything that's in prev turn
@@ -653,11 +641,9 @@ class Round {
   }
 
   makeComputerPlay() {
-    // if (this.numPasses < 3) {
     if (this.turn !== "player") {
       this.computers[this.turn].determineActionGenericTurn();
     }
-    // }
   }
 
   startRound() {
@@ -712,6 +698,7 @@ class BigTwoGame {
     A: "Ace",
     2: "2",
   };
+
   static fiveCardsRankNameMapping = {
     straight: "Straight",
     flush: "Flush",
@@ -719,6 +706,7 @@ class BigTwoGame {
     fourofakind: "Four of a Kind",
     straightflush: "Straight Flush",
   };
+
   static suitsRank = {
     D: 1,
     C: 2,
