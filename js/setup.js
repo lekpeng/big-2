@@ -32,12 +32,12 @@ if (Object.keys(localStorage).includes("player-name")) {
 }
 
 // Event listener for music
-document.querySelector("#toggle-audio").addEventListener("click", (event) => {
-  if (event.target.className === "btn btn-danger") {
-    event.target.className = "btn btn-success";
+document.querySelector("#audio-button").addEventListener("click", (event) => {
+  if (event.target.style.backgroundColor === "salmon") {
+    event.target.style.backgroundColor = "lawngreen";
     document.querySelector("audio").play();
   } else {
-    event.target.className = "btn btn-danger";
+    event.target.style.backgroundColor = "salmon";
     document.querySelector("audio").pause();
   }
 });

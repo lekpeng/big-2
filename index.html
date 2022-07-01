@@ -16,18 +16,27 @@
   <body>
     <div class="main">
       <div class="menu">
-        <button type="button" class="btn btn-primary">
-          <a href="./index.html">Home</a>
-        </button>
-        <button
-          id="about-button"
-          type="button"
-          class="btn btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target="#about-modal"
-        >
-          About
-        </button>
+        <nav class="navbar bg-white">
+          <!-- <nav class="navbar navbar-expand-lg bg-white"> -->
+          <div class="container-fluid">
+            <ul class="navbar-nav">
+              <div class="d-flex flex-column">
+                <li class="nav-item">
+                  <a class="nav-link" href="./index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                  <a
+                    class="nav-link"
+                    style="cursor: pointer"
+                    data-bs-toggle="modal"
+                    data-bs-target="#about-modal"
+                    >About</a
+                  >
+                </li>
+              </div>
+            </ul>
+          </div>
+        </nav>
         <div class="modal fade" id="about-modal" tabindex="-1">
           <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -80,7 +89,8 @@
 
                 <h6>Pairs</h6>
                 <p>
-                  A pair of equal ranked cards - twos are highest and threes are lowest. <br />
+                  A pair of equal ranked cards - twos are highest and threes are lowest.
+                  <br />
                   Between equal ranked pairs, the one containing the highest suit is better - for
                   example a 9 of spades and 9 of diamonds will beat the other pair of 9's.
                 </p>
@@ -111,7 +121,8 @@
                   </li>
                   <br />
                   <li>
-                    A Full House consists of three cards of one rank and two of another rank <br />
+                    A Full House consists of three cards of one rank and two of another rank
+                    <br />
                     Between two full houses, the one whose triple is of higher rank is better - so
                     for example 9-9-9-4-4 beats 8-8-8-K-K.
                   </li>
@@ -150,17 +161,10 @@
           <form class="row g-3" id="player-name-form">
             <label for="player-input-name" class="form-label">I would like to go by</label>
             <div class="col-auto">
-              <input
-                type="text"
-                class="form-control form-control-lg"
-                id="player-input-name"
-                autocomplete="off"
-              />
+              <input type="text" class="form-control" id="player-input-name" autocomplete="off" />
             </div>
             <div class="col-auto">
-              <button id="submit-button" type="submit" class="btn btn-primary btn-lg">
-                Submit
-              </button>
+              <button id="submit-button" type="submit" class="btn btn-primary">Submit</button>
             </div>
           </form>
           <button id="start-game-button" type="button" class="btn btn-success btn-lg">

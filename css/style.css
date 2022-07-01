@@ -6,8 +6,11 @@
   --p3: 0deg;
   --p4: 90deg;
 }
+
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+
 body {
-  font-family: "Arial", Helvetica, sans-serif;
+  font-family: "Roboto", sans-serif;
   margin: auto;
 }
 
@@ -15,8 +18,8 @@ button {
   font-size: 0.8em;
 }
 
-a:link,
-a:visited {
+.btn a:link,
+.btn a:visited {
   color: white;
   text-decoration: none;
 }
@@ -29,15 +32,34 @@ a:visited {
 
 /* MENU */
 .menu {
-  flex-basis: 5%;
+  flex-basis: 7%;
 }
 
-.menu button {
-  display: block;
-  margin-left: 0.5em;
+.menu li {
   margin-bottom: 0.5em;
 }
 
+.menu .container-fluid {
+  padding: 3px;
+  justify-content: center;
+}
+.menu a {
+  padding: 5px;
+}
+
+#audio-button {
+  background-color: salmon;
+  color: black;
+  border: solid black 2px;
+  cursor: pointer;
+}
+
+#restart-button {
+  margin-top: 3em;
+  background-color: skyblue;
+  color: black;
+  border: solid black 2px;
+}
 /* ABOUT */
 .modal-header {
   margin-top: 2em;
@@ -65,6 +87,7 @@ a:visited {
 
 .introduction h6 {
   font-style: italic;
+  font-weight: normal;
   margin-top: 1.5em;
   margin-bottom: 5em;
 }
@@ -190,12 +213,23 @@ a:visited {
   text-align: right;
 }
 
+.sort-buttons :hover {
+  background-color: black;
+  color: white;
+  transition: 0.3s;
+}
+
+.play-pass-buttons :hover {
+  background-color: black;
+  color: white;
+  transition: 0.3s;
+}
+
 #com-1 button,
 #com-2 button,
 #com-3 button {
   visibility: hidden;
 }
-
 /* CENTER BOARD */
 #center-board {
   --dw: var(--w);
