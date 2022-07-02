@@ -24,7 +24,7 @@ Link to API: http://deckofcardsapi.com/
 ---
 As I knew that the game would require a large number of functions, I decided to make use of OOP so that these functions could be better encapsulated within objects.
 
-I started with a more manual implementation where all four players are controlled by the user. After ensuring that the game was running seamlessly, I added a class for "Computers" to allow the used to play with three computer players.
+I started with a more manual implementation where all four players are controlled by the user. After ensuring that the game was running seamlessly, I added a class for "Computers" to allow the user to play with three computer players.
 
 Upon the distribution of cards, the computer sorts and partitions its hand into five card combinations, pairs, and single cards. During its turn, it then goes through the cards in the appropriate category and plays the weakest valid set of cards. As this process does not take much time, I used AJAX so that the user is given time to see the cards played by the computer players.
 
