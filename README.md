@@ -43,4 +43,4 @@ Click "About" to understand the game rules and add your name if you wish, before
 - Use a modal instead of displaying in the center when the user makes an invalid move.
 - Remove unnecessary steps such as the computer clicking on the pass and play buttons, as well as checking the validity of the computer's selection 
 - Add responsive design for mobile playing
-- Make computer players play smarter using reinforecement learning
+- Make computer players play smarter using reinforcement learning
