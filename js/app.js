@@ -758,13 +758,13 @@ class BigTwoGame {
     this.orderMapping = {};
   }
   async getDeckID() {
-    if (Object.keys(localStorage).includes("deck-id")) {
-      deckID = localStorage["deck-id"];
-    } else {
-      const data = await fetchDataAsync(urlGetDeckID);
-      deckID = data.deck_id;
-      localStorage.setItem("deck-id", deckID);
-    }
+    // if (Object.keys(localStorage).includes("deck-id")) {
+    //   deckID = localStorage["deck-id"];
+    // } else {
+    const data = await fetchDataAsync(urlGetDeckID);
+    deckID = data.deck_id;
+    //   localStorage.setItem("deck-id", deckID);
+    // }
     urlShuffle = `https://deckofcardsapi.com/api/deck/${deckID}/shuffle/`;
     urlDraw = `https://deckofcardsapi.com/api/deck/${deckID}/draw/?count=52`;
   }
