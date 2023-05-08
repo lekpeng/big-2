@@ -6,7 +6,7 @@ Big Two (also known as Dai Di in Cantonese) is a popular four-player card game w
 
 ### Link to Game
 ---
-https://lekpeng96.github.io/big-2/
+https://lekpeng.github.io/big-2/
 
 ### Tech
 ---
